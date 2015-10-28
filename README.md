@@ -2,7 +2,7 @@
 
 ** under development **
 
-Standardizing inputs, outputs, and processing steps of DeepDive for a cloud deployment/tool. Choose your input corpus, terminologies, and deployment environment, and an application will be generated to run your analysis. You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
+Standardizing inputs, outputs, and processing steps of DeepDive for a cloud deployment/tool. Choose your input corpus, terminologies, and deployment environment, and an application will be generated to run your analysis. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [deepdive-plugins](http://www.github.com/vsoch/deepdive-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
 
 [will eventually be here](https://pypi.python.org/pypi/deepdive)
 
