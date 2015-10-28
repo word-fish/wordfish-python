@@ -1,0 +1,7 @@
+numpy
+nltk
+flask
+Bio
+neurosynth
+cognitiveatlas
+gitpython

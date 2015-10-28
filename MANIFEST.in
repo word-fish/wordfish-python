@@ -1,0 +1,2 @@
+recursive-include psiturkpy/templates *
+recursive-include psiturkpy/static *
