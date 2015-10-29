@@ -3,9 +3,13 @@ vm: part of the deepdive python package
 functions for working with virtual machines, repos
 
 '''
+from deepdive.utils import copy_directory, get_template, save_template
+from deepdive.plugin import get_plugins, move_plugins, load_plugins
 from git import Repo
+import numpy
 import tempfile
 import shutil
+import re
 import os
 
 
@@ -38,6 +42,12 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
         if plugins != None:
             subset_plugins = [x for x in valid_plugins if os.path.basename(x) in plugins]
             valid_plugins = subset_plugins  
+
+        # Generate the setup.py from template to include all python dependencies for plugins
+        generate_setup(app_dest,valid_plugins)
+
+        # Copy valid plugins into app_repo
+        move_plugins(valid_plugins,app_dest)
 
     else:
         print "Folder exists at %s, cannot generate." %(battery_dest)
@@ -107,7 +117,38 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
         return "postgresql://deepdive:deepdive@localhost:5432/deepdive"
 
 
-def generate_setup():
+def generate_setup(app_dest,valid_plugins):
     '''
     generate_setup will generate a custom setup.py from a template
+    this will include the python dependencies for valid plugins
     '''
+    plugin_folder = os.path.dirname(valid_plugins[0])
+    v = load_plugins(valid_plugins)
+
+    # Add plugin dependencies on other plugins, even if user has not selected
+    plugin_deps = [x[0]["dependencies"]["plugins"] for x in v if "plugins" in x[0]["dependencies"]]
+    for plugin_dep in plugin_deps:
+        for p in plugin_dep:
+            if "%s/%s" %(plugin_folder,p) not in valid_plugins:
+                valid_plugins.append("%s/%s" %(plugin_folder,p))
+
+    # Get list of python dependencies for setup.py
+    python_deps = [x[0]["dependencies"]["python"] for x in v if "python" in x[0]["dependencies"]]
+    dependencies = []
+    for python_dep in python_deps:
+        dependencies = dependencies + python_dep
+    dependencies = numpy.unique(dependencies).tolist()
+
+    # Get setup.py from app_dest to use as a template
+    setup = get_template("%s/setup.py" %(app_dest)).split("\n")
+    expression = re.compile("install_requires")
+    startre = re.compile("[[]")
+    for l in range(0,len(setup)):
+        if expression.search(setup[l]):
+            start = startre.search(setup[l]).start()
+            old_deps = [x.strip("'").strip("'") for x in  setup[l][start:-1].strip(']').strip('[').split(",")]
+            new_deps = numpy.unique(dependencies + old_deps).tolist()
+            setup[l] = "%s%s" %(setup[l][0:start],str(new_deps))
+    
+    # Save template
+    save_template("%s/setup.py" %(app_dest),"\n".join(setup))

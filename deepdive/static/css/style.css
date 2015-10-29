@@ -13,10 +13,18 @@ body {
        background-size: cover;
 }
 
+.info-text{
+  color:white;
+}
+
 strong { font-weight: 500; }
 
-.deploy_choice {
-    padding-left:50px
+#terminology {
+  padding-bottom:30px;
+}
+
+#corpus {
+  padding-bottom:30px;
 }
 
 a, a:hover, a:focus {

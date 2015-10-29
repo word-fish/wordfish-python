@@ -7,8 +7,7 @@ this set of functions finds and validates plugins for inclusion in the package
 TODO: These functions will be written when it is time to create the web app portion of this.
 
 '''
-from deepdive.vm import download_repo
-from deepdive.utils import find_directories, remove_unicode_dict
+from deepdive.utils import find_directories, remove_unicode_dict, copy_directory
 from glob import glob
 import json
 import os
@@ -64,6 +63,47 @@ def validate(plugin_folder):
     else:
         return notvalid("cannot load config.json")
     return True   
+
+def get_corpus(plugins,return_field=None):
+    '''get_corpus:
+    return list of corpus for plugins that have it defined
+    Parameters
+    ==========
+    plugins: dict
+        list of plugins to look through (dict)
+    Returns
+    =======
+    corpus: list
+       list of plugins with corpus
+    '''
+    corpus = filter_by_field(plugins,"corpus","True")
+    if return_field != None:
+        corpus = [x[0][return_field] for x in corpus]
+    return corpus
+    
+def filter_by_field(plugins,field,field_value):
+    passing = []
+    for plugin in plugins:
+        if plugin[0][field] == field_value:
+            passing.append(plugin)
+    return passing
+
+def get_terms(plugins,return_field=None):
+    '''get_terms:
+    return list of corpus for plugins that have it defined
+    Parameters
+    ==========
+    plugins: dict
+        list of plugins to look through
+    Returns
+    =======
+    terms: list
+       list of plugins with terms defined
+    '''
+    terms = filter_by_field(plugins,"terms","True")
+    if return_field != None:
+        terms = [x[0][return_field] for x in terms]
+    return terms
 
 
 def get_plugins(plugin_repo=None,load=False):
@@ -126,4 +166,23 @@ def load_plugin(plugin_folder):
         return [meta]
     except ValueError as e:
         print "Problem reading config.json, %s" %(e)
+
+
+def move_plugins(valid_plugins,app_dest):
+    '''
+    Moves valid plugins into the app folder for install
+    
+        valid_plugins: a list of full paths to valid plugin folders
+        app_dest: full path to app destination folder
+    '''
+
+    moved_plugins = []
+    for valid_plugin in valid_plugins:
+        try:
+            plugin_folder = os.path.basename(valid_plugin)
+            copy_directory(valid_plugin,"%s/deepdive/plugins/%s" %(app_dest,plugin_folder))
+            moved_plugins.append(valid_plugin)
+        except:
+           print "Cannot move %s, will not be installed." %(valid_plugin)
+    return moved_plugins
 

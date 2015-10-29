@@ -1,5 +1,5 @@
 from deepdive.vm import generate_database_url, custom_app_download, generate_app
-from deepdive.plugin import get_plugins
+from deepdive.plugin import get_plugins, get_corpus, get_terms
 from flask import Flask, render_template, request
 from psiturkpy.utils import copy_directory
 from werkzeug import secure_filename
@@ -75,10 +75,14 @@ def validate():
 
         # Get valid plugins to present to user
         valid_plugins = get_plugins("%s/plugins/" %(tmpdir),load=True)
-
+        corpus = get_corpus(valid_plugins)
+        terms = get_terms(valid_plugins)
+ 
         return render_template('plugins.html',
-                                plugins=str(valid_plugins),
-                                this_many=len(valid_plugins),
+                                plugins=str(corpus),
+                                terms=str(terms),
+                                this_many_corpus=len(corpus),
+                                this_many_terms=len(terms),
                                 tmpdir=tmpdir,
                                 deploychoice=fields["deploychoice"])
 
@@ -109,9 +113,9 @@ def select():
             # Add to the application
             app_dest = "%s/app" %(tmpdir)
             generate_app(app_dest,app_repo="%s/python"%tmpdir,
-                     plugins=plugin_folders,
-                     make_setup=True)
-
+                                  plugin_repo="%s/plugins"%tmpdir,
+                                  plugins=selected_plugins)
+    
         # Option 2 or 3: Virtual machine (vagrant) or cloud (aws)
         #else: #TODO:WRITEME
             #specify_experiments(battery_dest=tmpdir,experiments=selected_experiments)
