@@ -8,30 +8,74 @@ import tempfile
 import shutil
 import os
 
-def download_repo(repo_url,destination):
+
+def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
+    '''generate 
+    create an app (python module) from a template and list of plugins
+    Parameters
+    ==========
+    app_dest: path
+        folder to generate the app (python module) in
+    app_repo: path
+        full path to deepdive-python (template) repo
+    plugins: list
+        full paths to plugin folders for inclusion
+    '''
+    # We can only generate an in a folder that does not exist, to be safe
+    if not os.path.exists(app_dest):
+        if app_repo == None or plugin_repo == None:
+            tmpdir = custom_app_download()
+            if app_repo == None:
+                app_repo = "%s/python" %(tmpdir)     
+            if plugin_repo == None:
+                plugin_repo = "%s/plugins" %(tmpdir)     
+
+        # Copy app skeleton to destination
+        copy_directory(app_repo,app_dest)
+        valid_plugins = get_plugins(plugin_repo)
+
+        # If the user wants to select a subset
+        if plugins != None:
+            subset_plugins = [x for x in valid_plugins if os.path.basename(x) in plugins]
+            valid_plugins = subset_plugins  
+
+    else:
+        print "Folder exists at %s, cannot generate." %(battery_dest)
+
+
+
+def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
+    '''custom_app_download
+    download both repos for the code and plugins to validate
+    '''
+    acceptable_types = ["plugins","python"]
+    if not tmpdir:
+        tmpdir = tempfile.mkdtemp()
+    if isinstance(repo_types,str):
+        repo_types = [repo_types]
+    for repo in repo_types:
+        if repo in acceptable_types:
+            download_repo("https://www.github.com/vsoch/deepdive-%s" %(repo),"%s/%s" %(tmpdir,repo))
+        else:
+            print "%s is not an acceptable option for repo_types." %(repo)
+    return tmpdir
+
+
+def download_repo(repo_url,tmpdir=None):
     '''download_repo
     Download a github repo to a destination
     Parameters
     ==========
+    tmpdir: path
+       full path to download repo to
     repo_url: path 
        full url path to repo
     destination: path
        the full path to the destination for the repo
     '''
-    return Repo.clone_from(repo_url, destination)
-
-
-def tmp_download(tmpdir=None,repo_url):
-    '''tmp_download
-    download a repo to a temporary folder, return path to repo in temp directory
-    tmpdir: path 
-        The directory to download to. If none, a temporary directory will be made
-    repo_url: url
-        The repository to download
-    '''
     if not tmpdir:
         tmpdir = tempfile.mkdtemp()
-    download_repo(repo_url,tmpdir)
+    Repo.clone_from(repo_url,tmpdir)
     return tmpdir
 
 
@@ -61,3 +105,9 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
         return "mysql://deepdive:deepdive@localhost:3306/deepdive"
     elif template == "postgresql":
         return "postgresql://deepdive:deepdive@localhost:5432/deepdive"
+
+
+def generate_setup():
+    '''
+    generate_setup will generate a custom setup.py from a template
+    '''

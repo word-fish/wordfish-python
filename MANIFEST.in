@@ -1,2 +1,2 @@
-recursive-include psiturkpy/templates *
-recursive-include psiturkpy/static *
+recursive-include deepdive/templates *
+recursive-include deepdive/static *

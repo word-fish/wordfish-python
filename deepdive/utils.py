@@ -55,6 +55,8 @@ def remove_unicode_dict(input_dict,encoding="utf-8"):
             output_new = input_dict[key]
         elif isinstance(input_dict[key],float):
             output_new = input_dict[key]
+        elif isinstance(input_dict[key],dict):
+            output_new = remove_unicode_dict(input_dict[key])
         else:
             output_new = input_dict[key].encode(encoding)
         output_dict[key.encode(encoding)] = output_new

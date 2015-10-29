@@ -6,6 +6,17 @@ Standardizing inputs, outputs, and processing steps of DeepDive for a cloud depl
 
 [will eventually be here](https://pypi.python.org/pypi/deepdive)
 
+Call the tool to configure your application:
+![view1](example/img/view1.png)
+
+Setup your database, or have the tool set it up for you.
+![view2](example/img/view2.png)
+
+Select your deployment preference.
+![view3](example/img/view3.png)
+
+** still under development **
+
 ## Overview of Project
 I first tried setting up DeepDive in a standard way, to perform extractions of mentions and features by way of the deepdive executable, to the database. The project was ultimately successful in that I completed all steps through inference, but it was too hard. I then had two choices - to be a user and try to refine my particular classifier, or try to improve the process (now that I understand it). I did not feel that I had the amount of control that would be desired, as the current infrastructure does not extend well to a SLURM environment with a launch setup. I realized very quickly that I was using the DeepDive command simply as a wrapper to write to the data base, and given that I had to write my own scripts anyway, it would be easiest to break apart the initial steps for extractions, build more "container-ized" methods to do initial steps, and then use DeepDive for the training and inference (where I see it's strength). It was also apparent that with the current setup, users would be doing different versions of the same thing, over again, and this is not efficient. I want to start from scratch with a modified infrastructure, and this gives me an opportunity to think about how I want to do this, because it needs to be a lot easier than it currently is. My first goal is to standardize the process, and build a set of python tools that can work with simple inputs and outputs for (what will eventually be) a cloud-based or VM-based deployment. I am going to think about this in the context of Neuroimaging / Psychology analysis, and that all steps should come from data structures (and not manually doing things).
 

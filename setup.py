@@ -34,11 +34,11 @@ setup(
     long_description=long_description,
     keywords='deepdive, nlp, text parsing',
 
-    install_requires = ['numpy','gitpython','nltk','neurosynth','Bio','pandas'],
+    install_requires = ['numpy','gitpython','nltk','neurosynth','pandas'],
 
     entry_points = {
         'console_scripts': [
-            'ddpython=deepdive.script:main',
+            'ddpython=deepdive.interface:main',
         ],
     },
 

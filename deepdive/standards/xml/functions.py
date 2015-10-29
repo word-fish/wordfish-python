@@ -51,7 +51,7 @@ def recursive_text_extract(xmltree,element_name):
             for elem in reversed(list(current)):
                 queue.append(elem)
 
-    return = record_ids
+    return record_ids
 
 
 def extract_xml_compressed(tarball):
