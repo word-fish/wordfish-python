@@ -6,7 +6,21 @@ Standardizing inputs, outputs, and processing steps of DeepDive for a cloud depl
 
 [will eventually be here](https://pypi.python.org/pypi/deepdive)
 
+** under development! ** not ready for use!
+
+
+### 0. Install the tool
+
+      pip install git+git://github.com/vsoch/deepdive-python.git
+
+
+### 1. Generate your application
+
 Call the tool to configure your application:
+
+    ddpython
+
+
 ![view1](example/img/view1.png)
 
 Setup your database, or have the tool set it up for you.
@@ -15,7 +29,62 @@ Setup your database, or have the tool set it up for you.
 Select your deployment preference.
 ![view3](example/img/view3.png)
 
-** still under development **
+This will produce a folder for you to drop in your cluster environment.
+
+### 2. Install dependencies
+
+Drop the folder into your home directory of your cluster environment. Run the install script to install deepdive, corenlp, and the package itself. The first (and only) argument is the project directory where you want your data and outputs to live.
+
+      
+      WORK=/scratch/users/vsochat/deepdive-nlp
+      bash install.sh $WORK
+      
+
+### 3. Prepare cluster jobs
+
+After installations are complete, this install script will also call `run.py`, which will do preliminary work preparing all input files and corpus to do extractions. This is just preparing job files and is not hugely computationally intensive, and could probably be done on a screen on a home node. If you feel antsy about it, you can connect to a dev node. If you look at the run.py script, you will see commands appended to prepare the corpus and terms that you specified. This is going to generate the following file structure in your project folder (and files that will eventually be produced are shown):
+
+      WORK
+          SOFTWARE
+              deepdive
+              stanford-corenlp...
+          APP
+              corpus
+                  corpus1
+                      12345_sentences.txt
+                      12346_sentences.txt
+                  corpus2
+                      12345_sentences.txt
+                      12346_sentences.txt
+              extractions
+                      corpus1_12345_extractions.txt
+                      corpus1_12346_extractions.txt
+                      corpus2_12345_extractions.txt
+                      corpus2_12346_extractions.txt
+              terms
+                  terms1
+                  terms2
+
+              jobs
+                  run1_corenlp.txt
+                  run2_mentions.txt
+                  run3_relations.txt
+                  run4_features.txt
+                  run5_inference.txt
+              scripts
+                  run_stanford_parser.py 
+
+The folders are generated dynamically for each corpus and terms plugin based on the "tag" variable in the plugin's config. The tag names for the plugins are the only unique requirement, and the creator of the plugin can either decide a meaningful unique id for the sentences output, or not specify and let deepdive.corpus decide. This doesn't matter until all extractions are complete, at which time a unique ID is assigned to the files.
+
+### 4. Run cluster jobs
+
+Most of these files are not generated with the run.py script - the run.py script generates jobs to be run in parallel to produce these files (in the "jobs" directory), and some of these jobs require generic scripts (in the "scripts" directory) that use deepdive-python functions in the cluster environment. The high level idea is that we package each step of the pipeline into a set of jobs that can be run in parallel (specified as lines in each file in the "jobs" directory). This means that after running run.py, you will have sentenves for each corpus, a term data structure for each data structure, and a folder filled with "jobs" to submit to a cluster, and run in the order specified when the previous step has completed. This package provides functions for running these commands in a slurm (submission) environment, or a launch system (all at once) (details to follow).
+
+(Note: For now, since obtaining the corpus and parsing to sentences is not computationally or time intensive, this is also done by the run script, but this could also be moved to be a cluster task.)
+
+** under development **
+more details to come as they are figured out, coded, etc.
+
 
 ## Overview of Project
 I first tried setting up DeepDive in a standard way, to perform extractions of mentions and features by way of the deepdive executable, to the database. The project was ultimately successful in that I completed all steps through inference, but it was too hard. I then had two choices - to be a user and try to refine my particular classifier, or try to improve the process (now that I understand it). I did not feel that I had the amount of control that would be desired, as the current infrastructure does not extend well to a SLURM environment with a launch setup. I realized very quickly that I was using the DeepDive command simply as a wrapper to write to the data base, and given that I had to write my own scripts anyway, it would be easiest to break apart the initial steps for extractions, build more "container-ized" methods to do initial steps, and then use DeepDive for the training and inference (where I see it's strength). It was also apparent that with the current setup, users would be doing different versions of the same thing, over again, and this is not efficient. I want to start from scratch with a modified infrastructure, and this gives me an opportunity to think about how I want to do this, because it needs to be a lot easier than it currently is. My first goal is to standardize the process, and build a set of python tools that can work with simple inputs and outputs for (what will eventually be) a cloud-based or VM-based deployment. I am going to think about this in the context of Neuroimaging / Psychology analysis, and that all steps should come from data structures (and not manually doing things).

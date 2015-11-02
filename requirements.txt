@@ -1,7 +1,5 @@
 numpy
 nltk
 flask
-Bio
-neurosynth
-cognitiveatlas
 gitpython
+git://github.com/brendano/stanford_corenlp_pywrapper.git

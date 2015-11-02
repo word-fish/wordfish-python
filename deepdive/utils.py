@@ -4,27 +4,50 @@ part of the deepdive python tools
 
 '''
 
+from glob import glob
 import errno
+import tarfile
 import shutil
 import os
 import re
 import __init__
 
 
+def init_scripts(scripts_dir):
+    '''init_scripts:
+    move job running scripts from template into user
+    scripts directory
+    '''
+    installdir = get_installdir()
+    scripts_to_move = glob("%s/deepdive/scripts/*")
+    for script in scripts_to_move:
+        script_name = os.path.basename(script)
+        shutil.copyfile(script,"%s/%s" %(scripts_dir,script_name))
+
 def get_installdir():
     return os.path.dirname(os.path.abspath(__init__.__file__))
 
-'''
-Return directories (and sub) starting from a base
 
-'''
 def find_subdirectories(basepath):
+    '''find_subdirectories
+    Return directories (and sub) starting from a base
+    '''
     directories = []
     for root, dirnames, filenames in os.walk(basepath):
         new_directories = [d for d in dirnames if d not in directories]
         directories = directories + new_directories
     return directories
     
+'''
+Make a directory if it doesn't exist
+
+'''
+
+def make_directory(dirname):
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+    return dirname
+
 '''
 Return directories at one level specified by user
 (not recursive)
@@ -98,6 +121,12 @@ def save_template(output_file,html_snippet):
     filey = open(output_file,"w")
     filey.writelines(html_snippet)
     filey.close()
+
+def untar(tar_file,destination="."):
+    tar = tarfile.open(tar_file)
+    tar.extractall(path=destination)
+    tar.close()
+    return tar
 
 """
 Check type

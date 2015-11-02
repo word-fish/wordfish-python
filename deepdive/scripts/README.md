@@ -1,0 +1,1 @@
+These are scripts used at runtime on the cluster to do extractions, etc. They each use functions in deepdive-python, and they are copied to the project directory when the user first runs the application, and calls are also generated dynamically.
