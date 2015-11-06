@@ -2,7 +2,7 @@
 
 ** under development **
 
-Standardizing inputs, outputs, and processing steps of DeepDive for a cloud deployment/tool. Choose your input corpus, terminologies, and deployment environment, and an application will be generated to run your analysis. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [deepdive-plugins](http://www.github.com/vsoch/deepdive-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
+Standardizing inputs, outputs, and processing steps of "deepdive-like" platform for a cloud deployment/tool. Choose your input corpus, terminologies, and deployment environment, and an application will be generated to run your analysis. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [deepdive-plugins](http://www.github.com/vsoch/deepdive-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
 
 [will eventually be here](https://pypi.python.org/pypi/deepdive)
 
@@ -75,6 +75,8 @@ After installations are complete, this install script will also call `run.py`, w
                   run_stanford_parser.py 
 
 The folders are generated dynamically for each corpus and terms plugin based on the "tag" variable in the plugin's config. The tag names for the plugins are the only unique requirement, and the creator of the plugin can either decide a meaningful unique id for the sentences output, or not specify and let deepdive.corpus decide. This doesn't matter until all extractions are complete, at which time a unique ID is assigned to the files.
+
+Note: I am not entirely sure that this pipeline will use DeepDive, or the stanford parser, period. I think there might be more efficient ways to do similar analysis.
 
 ### 4. Run cluster jobs
 
