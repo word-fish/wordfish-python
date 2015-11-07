@@ -2,7 +2,7 @@
 
 browser:
  
-part of the deepdive python package: parsing of term data structures into formats for deepdive
+part of the wordfish python package: extracting relationships of terms from corpus
 this set of functions is for parsing content in a web browser
 
 '''

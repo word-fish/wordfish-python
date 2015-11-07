@@ -1,10 +1,10 @@
 '''
-vm: part of the deepdive python package
+vm: part of the wordfish python package
 functions for working with virtual machines, repos
 
 '''
-from deepdive.utils import copy_directory, get_template, save_template
-from deepdive.plugin import get_plugins, move_plugins, load_plugins
+from wordfish.utils import copy_directory, get_template, save_template
+from wordfish.plugin import get_plugins, move_plugins, load_plugins
 from git import Repo
 import numpy
 import tempfile
@@ -21,7 +21,7 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
     app_dest: path
         folder to generate the app (python module) in
     app_repo: path
-        full path to deepdive-python (template) repo
+        full path to wordfish-python (template) repo
     plugins: list
         full paths to plugin folders for inclusion
     '''
@@ -65,7 +65,7 @@ def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
         repo_types = [repo_types]
     for repo in repo_types:
         if repo in acceptable_types:
-            download_repo("https://www.github.com/vsoch/deepdive-%s" %(repo),"%s/%s" %(tmpdir,repo))
+            download_repo("https://www.github.com/vsoch/wordfish-%s" %(repo),"%s/%s" %(tmpdir,repo))
         else:
             print "%s is not an acceptable option for repo_types." %(repo)
     return tmpdir
@@ -112,9 +112,9 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
                                          host,
                                          table)
     elif template == "mysql":
-        return "mysql://deepdive:deepdive@localhost:3306/deepdive"
+        return "mysql://wordfish:wordfish@localhost:3306/wordfish"
     elif template == "postgresql":
-        return "postgresql://deepdive:deepdive@localhost:5432/deepdive"
+        return "postgresql://wordfish:wordfish@localhost:5432/wordfish"
 
 
 def generate_setup(app_dest,valid_plugins):

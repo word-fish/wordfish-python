@@ -2,4 +2,6 @@ numpy
 nltk
 flask
 gitpython
-git://github.com/brendano/stanford_corenlp_pywrapper.git
+beautifulsoup4
+gensim
+graphlab-create

@@ -1,8 +1,8 @@
 '''
 database.py
 
-part of the deepdive python package: functions to work with deepdive/database (not yet written)
-need to keep this simple!
+part of the wordfish python package: extracting relationships of terms from corpus
+
 
 '''
 
