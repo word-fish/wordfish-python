@@ -1,7 +1,8 @@
 '''
 terms.py
 
-part of the deepdive python package: parsing of term data structures into formats for deepdive
+part of the wordfish python package: extracting relationships of terms from corpus
+
 this set of functions works with different plugins (in plugins folder) to produce input terminologies
 to search for in corpus
 

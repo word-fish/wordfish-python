@@ -1,6 +1,6 @@
 '''
 utils.py
-part of the deepdive python tools
+part of the wordfish python tools
 
 '''
 
@@ -19,7 +19,7 @@ def init_scripts(scripts_dir):
     scripts directory
     '''
     installdir = get_installdir()
-    scripts_to_move = glob("%s/deepdive/scripts/*")
+    scripts_to_move = glob("%s/wordfish/scripts/*")
     for script in scripts_to_move:
         script_name = os.path.basename(script)
         shutil.copyfile(script,"%s/%s" %(scripts_dir,script_name))

@@ -1,13 +1,13 @@
 '''
 plugin.py
 
-part of the deepdive python package: parsing of term data structures into formats for deepdive
+part of the wordfish python package: extracting relationships of terms from corpus
 this set of functions finds and validates plugins for inclusion in the package
 
 TODO: These functions will be written when it is time to create the web app portion of this.
 
 '''
-from deepdive.utils import find_directories, remove_unicode_dict, copy_directory
+from wordfish.utils import find_directories, remove_unicode_dict, copy_directory
 from glob import glob
 import json
 import os
@@ -107,7 +107,7 @@ def get_terms(plugins,return_field=None):
 
 
 def get_plugins(plugin_repo=None,load=False):
-    '''get_plugins from a downloaded deepdive-plugins folder
+    '''get_plugins from a downloaded wordfish-plugins folder
     download plugin repo to destination folder
     Parameters
     ==========
@@ -134,7 +134,7 @@ def load_plugins(plugin_folders):
     Parameters
     ==========
     plugin_folders: list
-        a list of plugin folders from the deepdive-plugins repo
+        a list of plugin folders from the wordfish-plugins repo
     Returns
     =======
     plugins:
@@ -180,7 +180,7 @@ def move_plugins(valid_plugins,app_dest):
     for valid_plugin in valid_plugins:
         try:
             plugin_folder = os.path.basename(valid_plugin)
-            copy_directory(valid_plugin,"%s/deepdive/plugins/%s" %(app_dest,plugin_folder))
+            copy_directory(valid_plugin,"%s/wordfish/plugins/%s" %(app_dest,plugin_folder))
             moved_plugins.append(valid_plugin)
         except:
            print "Cannot move %s, will not be installed." %(valid_plugin)

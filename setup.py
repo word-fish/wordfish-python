@@ -10,13 +10,13 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     # Application name:
-    name="deepdive",
+    name="wordfish",
 
     # Version number (initial):
     version="1.0.0",
 
     # Application author details:
-    author="Poldracklab + HazyResearch",
+    author="Poldracklab",
     author_email="vsochat@stanford.edu",
 
     # Packages
@@ -27,18 +27,18 @@ setup(
     zip_safe=False,
 
     # Details
-    url="http://www.github.com/vsoch/deepdive",
+    url="http://www.github.com/vsoch/wordfish-python",
 
     license="LICENSE.txt",
-    description="Python application for standardizing inputs, outputs, and processing steps of DeepDive for a cloud deployment/tool",
+    description="Infrastructure for finding relationships between terms in corpus of interest.",
     long_description=long_description,
-    keywords='deepdive, nlp, text parsing',
+    keywords='wordfish, nlp, text parsing',
 
-    install_requires = ['numpy','gitpython','nltk','neurosynth','pandas'],
+    install_requires = ['numpy','gitpython','nltk','pandas'],
 
     entry_points = {
         'console_scripts': [
-            'ddpython=deepdive.interface:main',
+            'wordfish=wordfish.interface:main',
         ],
     },
 

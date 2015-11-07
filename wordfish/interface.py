@@ -1,5 +1,5 @@
-from deepdive.vm import generate_database_url, custom_app_download, generate_app
-from deepdive.plugin import get_plugins, get_corpus, get_terms
+from wordfish.vm import generate_database_url, custom_app_download, generate_app
+from wordfish.plugin import get_plugins, get_corpus, get_terms
 from flask import Flask, render_template, request
 from psiturkpy.utils import copy_directory
 from werkzeug import secure_filename
@@ -66,7 +66,7 @@ def validate():
         # LOCAL FOLDER #####################################################
         if fields["deploychoice"] == "folder":
 
-            # Prepare temp folder with cloned deepdive-python and deepdive-plugins
+            # Prepare temp folder with cloned wordfish-python and wordfish-plugins
             custom_app_download(tmpdir=tmpdir)
     
         #else: TODO: vm prep here! 
@@ -142,7 +142,7 @@ def clean_up(dirpath):
 
 # This is how the command line version will run
 def main():
-    print "Let's DeepDive!"
+    print "Let's Fish!"
     app.run(host="0.0.0.0",debug=True)
     
 if __name__ == '__main__':

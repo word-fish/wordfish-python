@@ -3,17 +3,17 @@
 # IMPORTS #########################################################################
 import os
 import sys
-from deepdive.utils import make_directory, init_scripts
-from deepdive.parser import prepare_corenlp
-from deepdive.terms import download_nltk
+from wordfish.utils import make_directory, init_scripts
+from wordfish.parser import prepare_corenlp
+from wordfish.terms import download_nltk
 
 # PLUGIN IMPORTS APPENDED HERE
-import deepdive.plugins.neurosynth as neurosynth
+import wordfish.plugins.neurosynth as neurosynth
 
 # DIRECTORIES #####################################################################
 analysis_dir = sys.argv[1]
 # /work/02092/vsochat/wrangler/
-corenlp_dir="/%s/SOFTWARE/stanford-corenlp-full-2015-04-20" %(analysis_dir)
+#corenlp_dir="/%s/SOFTWARE/stanford-corenlp-full-2015-04-20" %(analysis_dir)
 corpus_output = make_directory("%s/corpus" %(analysis_dir))
 terms_output = make_directory("%s/terms" %(analysis_dir))
 jobs_directory = make_directory("%s/jobs" %(analysis_dir))
