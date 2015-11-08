@@ -4,7 +4,7 @@ functions for working with virtual machines, repos
 
 '''
 from wordfish.utils import copy_directory, get_template, save_template
-from wordfish.plugin import get_plugins, move_plugins, load_plugins
+from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job
 from git import Repo
 import numpy
 import tempfile
@@ -44,10 +44,13 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
             valid_plugins = subset_plugins  
 
         # Generate the setup.py from template to include all python dependencies for plugins
-        generate_setup(app_dest,valid_plugins)
+        generate_setup(valid_plugins,app_dest)
 
         # Copy valid plugins into app_repo
         move_plugins(valid_plugins,app_dest)
+
+        # Generate run commands for each of relationship extractions
+        setup_relationship_extractions(valid_plugins,app_dest)
 
     else:
         print "Folder exists at %s, cannot generate." %(battery_dest)
@@ -116,7 +119,7 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
         return "postgresql://wordfish:wordfish@localhost:5432/wordfish"
 
 
-def generate_setup(app_dest,valid_plugins):
+def generate_setup(valid_plugins,app_dest):
     '''
     generate_setup will generate a custom setup.py from a template
     this will include the python dependencies for valid plugins
@@ -151,3 +154,20 @@ def generate_setup(app_dest,valid_plugins):
     
     # Save template
     save_template("%s/setup.py" %(app_dest),"\n".join(setup))
+
+def setup_relationship_extractions(valid_plugins,app_dest):
+    '''
+    setup_relationship_extractions will generate a run time script
+    directory in the base of the application folder, and then, for
+    each plugin for which relationship extraction is possible,
+    write a line to a job script (that can be run with launch or slurm)
+    to call the function.
+    '''
+    script_directory = "%s/scripts" %app_dest
+    if not os.path.exists(script_directory):
+        os.mkdir(script_directory)
+    extract_relationship_script = "%s/run_extraction_relationships.job" %script_directory
+    for valid_plugin in valid_plugins:
+        plugin = load_plugins(valid_plugin)[0]
+        if plugin[0]["relationships"] == "True":
+            write_plugin_relationship_job(plugin[0]["tag"],extract_relationship_script,"%s/wordfish/scripts" %(app_dest))

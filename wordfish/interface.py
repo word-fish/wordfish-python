@@ -1,7 +1,7 @@
 from wordfish.vm import generate_database_url, custom_app_download, generate_app
 from wordfish.plugin import get_plugins, get_corpus, get_terms
 from flask import Flask, render_template, request
-from psiturkpy.utils import copy_directory
+from wordfish.utils import copy_directory
 from werkzeug import secure_filename
 import tempfile
 import shutil
@@ -115,6 +115,10 @@ def select():
             generate_app(app_dest,app_repo="%s/python"%tmpdir,
                                   plugin_repo="%s/plugins"%tmpdir,
                                   plugins=selected_plugins)
+
+            # Find plugins with relationships == True
+            # A command is written to launch script for each
+            
 
             # TODO: 
             # For each plugin, need to write import statements,

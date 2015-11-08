@@ -165,3 +165,19 @@ def clean_fields(mydict):
         else:
             newdict[cleanfield] = value.encode("utf-8")
     return newdict
+
+# JOBS #####################################################
+
+def add_lines(script,lines_to_add):
+    if isinstance(lines_to_add,str):
+        lines_to_add = [lines_to_add]
+    lines = []
+    if os.path.exists(script):
+        filey = open(script,"rb")
+        lines = [x.strip("\n") for x in filey.readlines()]
+        filey.close()
+    for new_line in lines_to_add:
+        lines.append(new_line)
+    filey = open(script,"wb")
+    filey.writelines("\n".join(lines))
+    filey.close()

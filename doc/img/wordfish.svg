@@ -29,9 +29,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="197.21315"
-     inkscape:cy="520"
+     inkscape:zoom="1.4"
+     inkscape:cx="465.67216"
+     inkscape:cy="606.22066"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,7 +58,10 @@
      id="layer1">
     <g
        id="g3904"
-       transform="matrix(0.49178142,0.87071869,-0.87071869,0.49178142,557.22018,-76.364088)">
+       transform="matrix(0.49178142,0.87071869,-0.87071869,0.49178142,557.22018,-76.364088)"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
+       inkscape:export-xdpi="66.70713"
+       inkscape:export-ydpi="66.70713">
       <path
          inkscape:export-ydpi="66.70713"
          inkscape:export-xdpi="66.70713"
@@ -121,7 +124,7 @@
        sodipodi:ry="14.647212"
        d="m 400.02041,287.17163 a 14.647212,14.647212 0 1 1 -29.29442,0 14.647212,14.647212 0 1 1 29.29442,0 z"
        transform="matrix(0.95617605,0,0,0.95617605,-107.06569,39.95727)"
-       inkscape:export-filename="/home/vanessa/Desktop/logo.png"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
        inkscape:export-xdpi="66.70713"
        inkscape:export-ydpi="66.70713" />
     <path
@@ -134,7 +137,7 @@
        sodipodi:ry="14.647212"
        d="m 400.02041,287.17163 a 14.647212,14.647212 0 1 1 -29.29442,0 14.647212,14.647212 0 1 1 29.29442,0 z"
        transform="matrix(0.59359179,0,0,0.59359179,59.226375,119.45115)"
-       inkscape:export-filename="/home/vanessa/Desktop/logo.png"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
        inkscape:export-xdpi="66.70713"
        inkscape:export-ydpi="66.70713" />
     <path
@@ -147,7 +150,7 @@
        sodipodi:ry="14.647212"
        d="m 400.02041,287.17163 a 14.647212,14.647212 0 1 1 -29.29442,0 14.647212,14.647212 0 1 1 29.29442,0 z"
        transform="matrix(0.38640078,0,0,0.38640078,111.04219,167.30168)"
-       inkscape:export-filename="/home/vanessa/Desktop/logo.png"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
        inkscape:export-xdpi="66.70713"
        inkscape:export-ydpi="66.70713" />
     <path
@@ -160,16 +163,19 @@
        sodipodi:ry="14.647212"
        d="m 400.02041,287.17163 a 14.647212,14.647212 0 1 1 -29.29442,0 14.647212,14.647212 0 1 1 29.29442,0 z"
        transform="matrix(0.59359179,0,0,0.59359179,226.82443,151.55917)"
-       inkscape:export-filename="/home/vanessa/Desktop/logo.png"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
        inkscape:export-xdpi="66.70713"
        inkscape:export-ydpi="66.70713" />
     <path
        style="fill:none;stroke:#ffffff;stroke-width:9.18971825;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 502.30771,402.69012 c 6.38277,-1.70314 12.15861,-5.59894 16.12882,-10.87888 4.49598,-5.97915 6.59171,-13.47636 7.28061,-20.92548 0.6889,-7.44913 0.0643,-14.94777 -0.37356,-22.41586 -0.70884,-12.09042 -0.92717,-24.2096 -0.65425,-36.31771"
+       d="m 493.70186,399.8797 c 6.67456,0.63722 13.58288,-1.89006 18.27057,-6.68394 2.83114,-2.89527 4.86037,-6.56685 5.80565,-10.5044 0.94528,-3.93756 0.804,-8.13021 -0.40422,-11.9952"
        id="path3888"
        inkscape:path-effect="#path-effect3890"
-       inkscape:original-d="m 502.30771,402.69012 c 0,0 11.45707,2.14095 16.12882,-10.87888 3.30344,-9.20649 5.84866,-25.99009 6.90705,-43.34134 0.71239,-11.67879 -0.65425,-36.31771 -0.65425,-36.31771"
+       inkscape:original-d="m 493.70186,399.8797 c 0,0 10.60678,4.83159 18.27057,-6.68394 5.41915,-8.14279 0.20417,-5.91121 5.40143,-22.4996"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cssc" />
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="/home/vanessa/Documents/Dropbox/Code/wordfish/wordfish-python/wordfish/static/img/wordfish.png"
+       inkscape:export-xdpi="66.70713"
+       inkscape:export-ydpi="66.70713" />
   </g>
 </svg>

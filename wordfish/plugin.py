@@ -7,11 +7,12 @@ this set of functions finds and validates plugins for inclusion in the package
 TODO: These functions will be written when it is time to create the web app portion of this.
 
 '''
-from wordfish.utils import find_directories, remove_unicode_dict, copy_directory
+from wordfish.utils import find_directories, remove_unicode_dict, copy_directory, add_lines
 from glob import glob
 import json
 import os
 import nltk
+import numpy
 import pandas
 
 def get_validation_fields():
@@ -71,6 +72,9 @@ def get_corpus(plugins,return_field=None):
     ==========
     plugins: dict
         list of plugins to look through (dict)
+    return_file: str
+        The name of a field to return, if the entire
+        data structure is not desired
     Returns
     =======
     corpus: list
@@ -79,6 +83,7 @@ def get_corpus(plugins,return_field=None):
     corpus = filter_by_field(plugins,"corpus","True")
     if return_field != None:
         corpus = [x[0][return_field] for x in corpus]
+        corpus = numpy.unique(corpus).tolist()
     return corpus
     
 def filter_by_field(plugins,field,field_value):
@@ -103,6 +108,7 @@ def get_terms(plugins,return_field=None):
     terms = filter_by_field(plugins,"terms","True")
     if return_field != None:
         terms = [x[0][return_field] for x in terms]
+        terms = numpy.unique(terms).tolist()
     return terms
 
 
@@ -186,3 +192,7 @@ def move_plugins(valid_plugins,app_dest):
            print "Cannot move %s, will not be installed." %(valid_plugin)
     return moved_plugins
 
+def write_plugin_relationship_job(tag,extract_relationship_script,output_dir):
+    line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\
+%s\")'" %(tag,output_dir)
+    add_lines(script=extract_relationship_script,lines_to_add=[line_to_add])
