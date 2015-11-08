@@ -7,6 +7,7 @@ part of the wordfish python tools
 from glob import glob
 import errno
 import tarfile
+import urllib2
 import json
 import shutil
 import os
@@ -181,3 +182,14 @@ def add_lines(script,lines_to_add):
     filey = open(script,"wb")
     filey.writelines("\n".join(lines))
     filey.close()
+
+def has_internet_connectivity():
+    """has_internet_connectivity
+    Checks for internet connectivity by way of trying to
+    retrieve google IP address. Returns True/False
+    """
+    try:
+        response=urllib2.urlopen('http://www.google.com',timeout=1)
+        return True
+    except urllib2.URLError as err: pass
+    return False
