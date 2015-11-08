@@ -107,7 +107,7 @@ def save_terms(input_terms,output_dir=None):
             ids.append(term.lower())
     elif isinstance(input_terms,dict):
         for node, meta in input_terms.iteritems():
-            meta["name"] = node.lower()
+            meta["uid"] = node.lower()
             nodes.append(meta)
             ids.append(node.lower())
     else:
