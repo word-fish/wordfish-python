@@ -98,8 +98,7 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
         host: database host
         table: table in the database
         template: can be one of "mysql" "sqlite3" or "postgresql" If specified, all other parameters are
-                  ignored, and a default database URL is produced to work in a Vagrant VM produced by
-                  psiturkpy
+                  ignored, and a default database URL is produced to work in a Vagrant VM
     
     '''
     if not template:

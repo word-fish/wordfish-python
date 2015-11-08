@@ -7,10 +7,16 @@ part of the wordfish python tools
 from glob import glob
 import errno
 import tarfile
+import json
 import shutil
 import os
 import re
 import __init__
+
+def save_pretty_json(dict_obj,output_file):
+    with open(output_file, 'w') as outfile:
+        json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
+    return json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
 
 
 def init_scripts(scripts_dir):
