@@ -9,7 +9,7 @@
     <img src="doc/img/wordfish_smile.png" alt="wordfish" title="Wordfish" style="float:right"/>
 </div>
 
-Choose your input corpus, terminologies, and deployment environment, and an application will be generated to use deep learning to extract relationships between terms of interest, and classify new texty things. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [wordfish-plugins](http://www.github.com/vsoch/wordfish-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
+Choose your input corpus, terminologies, and deployment environment, and an application will be generated to use deep learning to extract features for text, and then entities can be mapped onto those features to discover relationships  and classify new texty things. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [wordfish-plugins](http://www.github.com/vsoch/wordfish-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
 
 [will eventually be here](https://pypi.python.org/pypi/wordfish)
 
@@ -44,7 +44,10 @@ This will produce a folder for you to drop in your cluster environment.
 
 ### 2. Install dependencies
 
-Drop the folder into your home directory of your cluster environment. Run the install script to install deepdive, corenlp, and the package itself. The first (and only) argument is the project directory where you want your data and outputs to live.
+Drop the folder into your home directory of your cluster environment. Run the install script to install the package itself, and start your analyses. The pipeline is a mixture of local processing, and submitting scripts to a SLURM environment for larger jobs. The first (and only) argument is the project directory where you want your data and outputs to live. 
+
+#### Project Current Status
+[Plugins](https://github.com/vsoch/wordfish-plugins) are being developed, and pipelines tested. When this is finished, the functionality will be integrated into the application generation. It is not yet decided if a database will be used for the initial processing. For deployment options, it makes sense to deploy the module folder to a cluster environment, and then perhaps deploy an application with docker. I have not yet decided.
 
       
       WORK=/scratch/users/vsochat/wordfish-nlp
@@ -53,7 +56,7 @@ Drop the folder into your home directory of your cluster environment. Run the in
 
 ### 3. Prepare cluster jobs
 
-After installations are complete, this install script will also call `run.py`, which will do preliminary work preparing all input files and corpus to do extractions. This is just preparing job files and is not hugely computationally intensive, and could probably be done on a screen on a home node. If you feel antsy about it, you can connect to a dev node. If you look at the run.py script, you will see commands appended to prepare the corpus and terms that you specified. This is going to generate the following file structure in your project folder (and files that will eventually be produced are shown):
+After installations are complete, this install script will also call `run.py`, which will do preliminary work preparing all input files and corpus. This is just preparing job files and is not hugely computationally intensive, and could probably be done on a screen on a home node. If you feel antsy about it, you can connect to a dev node. If you look at the run.py script, you will see commands appended to prepare the corpus and terms that you specified. This is going to generate the following file structure in your project folder (and files that will eventually be produced are shown):
 
       WORK
           SOFTWARE
@@ -80,7 +83,7 @@ The folders are generated dynamically for each corpus and terms plugin based on 
 
 ### 4. Run cluster jobs
 
-Most of these files are not generated with the run.py script - the run.py script generates jobs to be run in parallel to produce these files (in the "jobs" directory), and some of these jobs require generic scripts (in the "scripts" directory) that use deepdive-python functions in the cluster environment. The high level idea is that we package each step of the pipeline into a set of jobs that can be run in parallel (specified as lines in each file in the "jobs" directory). This means that after running run.py, you will have sentenves for each corpus, a term data structure for each data structure, and a folder filled with "jobs" to submit to a cluster, and run in the order specified when the previous step has completed. This package provides functions for running these commands in a slurm (submission) environment, or a launch system (all at once) (details to follow).
+Most of these files are not generated with the run.py script - the run.py script generates jobs to be run in parallel to produce these files (in the "jobs" directory), and some of these jobs require generic scripts (in the "scripts" directory) that use wordfish-python functions in the cluster environment. The high level idea is that we package each step of the pipeline into a set of jobs that can be run in parallel (specified as lines in each file in the "jobs" directory). This means that after running run.py, you will have sentences for each corpus, a term data structure for each data structure, and a folder filled with "jobs" to submit to a cluster, and run in the order specified when the previous step has completed. This package provides functions for running these commands in a slurm (submission) environment, or a launch system (all at once) (details to follow).
 
 (Note: For now, since obtaining the corpus and parsing to sentences is not computationally or time intensive, this is also done by the run script, but this could also be moved to be a cluster task.)
 
@@ -92,13 +95,13 @@ more details to come as they are figured out, coded, etc.
 #### Deployment Options
 
 ##### Virtual Machine
-The user can select to deploy to a vagrant-vm, or amazon-aws virtual machine. This means (for now) that all processing will be done in serial (or with a small job manager). This means that deepdive and an appropriate database can be configured and set up for the user, or he/she can specify a different database.
+The user can select to deploy to a vagrant-vm, or amazon-aws virtual machine. I am also considering docker. This will mean (for now) that all processing will be done in serial (or with a small job manager). 
 
 ##### Cluster
-The user can select to deploy an analysis application, meaning a zipped up folder with an install script to deploy in a cluster environment. I will start with two options for job managers: SLURM, and "launch" (meaning using a grid system set up with a SLURM cluster). For launch, commands will be executed as lines in a single file. For SLURM, commands will be sbatch commands submit from a particular user when jobs are allowed.
+The user can select to deploy an analysis application, meaning a folder with an install script to deploy in a cluster environment. I will start with two options for job managers: SLURM, and "launch" (meaning using a grid system set up with a SLURM cluster). For launch, commands will be executed as lines in a single file. For SLURM, commands will be sbatch commands submit from a particular user when jobs are allowed.
 
 #### Local
-If the user already has deepdive, the same zipped up folder can be deployed locally (sans cluster submission), but I don't see why anyone would want to do this.
+If the user wants to run things locally, the same folder can be deployed (sans cluster submission), but I don't see why anyone would want to do this.
 
 ### Standards
 Standards will be different kinds of file structures that the module will know how to parse. Including:
