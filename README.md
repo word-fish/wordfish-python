@@ -1,12 +1,13 @@
 # wordfish-python
 
-  >>   If pulling a thread of meaning from woven text
-  >>   is that which your heart does wish.
-  >>   Not so absurd or seemingly complex, 
-  >>   if you befriend a tiny word fish.
+  >>   If pulling a thread of meaning from woven text <br>
+  >>   is that which your heart does wish. <br>
+  >>   Not so absurd or seemingly complex,  <br>
+  >>   if you befriend a tiny word fish. <br>
 
-![wordfish](doc/img/wordfish.png) 
-img[alt=wordfish] { float: right; }
+<div style="float: right">
+    <img src="doc/img/wordfish.png" alt="wordfish" title="Wordfish"/>
+</div>
 
 Choose your input corpus, terminologies, and deployment environment, and an application will be generated to use deep learning to extract relationships between terms of interest, and classify new texty things. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [wordfish-plugins](http://www.github.com/vsoch/wordfish-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
 
