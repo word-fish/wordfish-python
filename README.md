@@ -33,10 +33,7 @@ Call the tool to configure your application:
 Setup your database, or have the tool set it up for you.
 ![view2](example/img/view2.png)
 
-Select from the available corpus.
-![view3](example/img/view3.png)
-
-Select your terminologies.
+Select your terminologies and corpus.
 ![view4](example/img/view4.png)
 
 A custom application is generated for you!
