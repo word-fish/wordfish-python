@@ -33,8 +33,15 @@ Call the tool to configure your application:
 Setup your database, or have the tool set it up for you.
 ![view2](example/img/view2.png)
 
-Select your deployment preference.
+Select from the available corpus.
 ![view3](example/img/view3.png)
+
+Select your terminologies.
+![view4](example/img/view4.png)
+
+A custom application is generated for you!
+![view5](example/img/view5.png)
+
 
 This will produce a folder for you to drop in your cluster environment.
 

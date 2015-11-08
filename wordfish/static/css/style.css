@@ -14,7 +14,7 @@ body {
 }
 
 .info-text{
-  color:white;
+  color:black;
 }
 
 strong { font-weight: 500; }
@@ -119,7 +119,7 @@ ul.navbar-nav {
 
 .navbar-brand {
 	width: 123px;
-	background: url(../img/ddwhitesmall.png) left center no-repeat;
+	background: url(../img/wordfish.png) left center no-repeat;
 	text-indent: -99999px;
 }
 
@@ -248,7 +248,7 @@ only screen and (                min-resolution: 2dppx) {
 	
 	/* logo */
     .navbar-brand {
-    	background-image: url(../img/ddwhitesmall.png) !important; background-repeat: no-repeat !important; background-size: 123px 49px !important;
+    	background-image: url(../img/wordfish.png) !important; background-repeat: no-repeat !important; background-size: 123px 49px !important;
     }
 	
 }
