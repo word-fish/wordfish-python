@@ -50,6 +50,11 @@ def validate(plugin_folder):
     """
 
     meta = load_plugin(plugin_folder)
+
+    # Don't return the template folder as an option
+    if meta[0]["tag"] == "template"
+        return False
+
     if meta != None:
         if len(meta)>1:
             return notvalid("config.json has length > 1, not valid.")

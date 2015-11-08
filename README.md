@@ -9,7 +9,7 @@
     <img src="doc/img/wordfish_smile.png" alt="wordfish" title="Wordfish" style="float:right"/>
 </div>
 
-Choose your input corpus, terminologies, and deployment environment, and an application will be generated to use deep learning to extract features for text, and then entities can be mapped onto those features to discover relationships  and classify new texty things. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [wordfish-plugins](http://www.github.com/vsoch/wordfish-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
+Choose your input corpus, terminologies, and deployment environment, and an application will be generated to use deep learning to extract features for text, and then entities can be mapped onto those features to discover relationships  and classify new texty things. Custom plugins will allow for dynamic generation of corpus and terminologies from data structures and standards of choice from [wordfish-plugins](http://www.github.com/word-fish/wordfish-plugins) You can have experience with coding (and use the functions in the module as you wish), or no experience at all, and let the interactive web interface walk you through generation of your application. This will ideally be able to generate single instances of analysis applications, and an instance that we can deploy on the cloud (and integrate into a collaborative, cloud-based tool for many researchers to use).
 
 [will eventually be here](https://pypi.python.org/pypi/wordfish)
 
@@ -18,7 +18,7 @@ Choose your input corpus, terminologies, and deployment environment, and an appl
 
 ### 0. Install the tool
 
-      pip install git+git://github.com/vsoch/wordfish-python.git
+      pip install git+git://github.com/word-fish/wordfish-python.git
 
 
 ### 1. Generate your application
@@ -47,7 +47,7 @@ This will produce a folder for you to drop in your cluster environment.
 Drop the folder into your home directory of your cluster environment. Run the install script to install the package itself, and start your analyses. The pipeline is a mixture of local processing, and submitting scripts to a SLURM environment for larger jobs. The first (and only) argument is the project directory where you want your data and outputs to live. 
 
 #### Project Current Status
-[Plugins](https://github.com/vsoch/wordfish-plugins) are being developed, and pipelines tested. When this is finished, the functionality will be integrated into the application generation. It is not yet decided if a database will be used for the initial processing. For deployment options, it makes sense to deploy the module folder to a cluster environment, and then perhaps deploy an application with docker. I have not yet decided.
+[Plugins](https://github.com/word-fish/wordfish-plugins) are being developed, and pipelines tested. When this is finished, the functionality will be integrated into the application generation. It is not yet decided if a database will be used for the initial processing. For deployment options, it makes sense to deploy the module folder to a cluster environment, and then perhaps deploy an application with docker. I have not yet decided.
 
       
       WORK=/scratch/users/vsochat/wordfish-nlp
