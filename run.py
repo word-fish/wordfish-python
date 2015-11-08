@@ -4,7 +4,6 @@
 import os
 import sys
 from wordfish.utils import make_directory, init_scripts
-from wordfish.parser import prepare_corenlp
 from wordfish.terms import download_nltk
 
 # PLUGIN IMPORTS APPENDED HERE
@@ -33,28 +32,8 @@ neurosynth.extract_text(output_dir="%s/neurosynth" %corpus_output)
 # TERMS ###########################################################################
 
 # TERMINOLOGY EXTRACTION APPENDED HERE
+neurosynth.extract_terms(output_file="%s/neurosynth_terms.json" %corpus_output)
 
 
-# STANFORD NLP ####################################################################
+# INFERENCE ########################################################################
 
-# GENERATE CORNLP EXTRACTION JOBS HERE
-
-prepare_corenlp(terms_input=terms_output,
-                corpus_input=corpus_output,
-                scripts_directory=scripts_directory,
-                jobs_directory=jobs_directory,
-                corenlp_dir=corenlp_dir)
-
-
-# DEEPDIVE ########################################################################
-
-# GENERATE MENTION EXTRACTIONS JOBS HERE
-
-
-# GENERATE RELATIONSHIP EXTRACTION JOBS HERE
-
-
-# GENERATE FEATURE EXTRACTION JOBS HERE
-
-
-# INFERENCE FUNCTIONS HERE

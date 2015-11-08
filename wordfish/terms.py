@@ -24,8 +24,8 @@ def download_nltk():
     return "%s/nltk_data" %(home)
 
 
-def save_terms(input_terms,output_dir=None,tag=None,relationships=None):
-    '''save_terms
+def save_relationships(input_terms,relationships,output_dir=None):
+    '''save_relationships
     Parameters
     =========
     input_terms: list,dict
@@ -43,14 +43,59 @@ def save_terms(input_terms,output_dir=None,tag=None,relationships=None):
         dictionary structure with the following format (parallel to what many d3
         algorithms use to define graphs)
 
-        {"nodes":[{"name":"node1"},
-                 {"name":"node2"}],
+        {
          "links": [{"source":"node1","target":"node2","value":0.5}]
         }
 
     '''
     # Not sure why anyone would do this, but might as well check
     links = []
+    ids = []
+    if isinstance(input_terms,str):
+        input_terms = [input_terms]
+    if isinstance(input_terms,list):
+        input_terms = [x.lower() for x in input_terms]
+        for term in input_terms:
+            ids.append(term.lower())
+    elif isinstance(input_terms,dict):
+        for node, meta in input_terms.iteritems():
+            ids.append(node.lower())
+    else:
+        print "Invalid input_terms, must be str, dict, or list."
+        return
+
+    # Save relationships
+    for tup in relationships:
+        if tup[0].lower() or tup[1].lower() not in ids:
+            print "Entry %s has nodes not defined in input_terms!" %(tup)
+            return
+        links.append({"source":tup[0],"target":tup[1],"value":tup[2]})
+
+    result = {"links":links}
+    if output_dir is not None:
+        save_pretty_json(result,"%s/%s_relationships.json" %(output_dir))
+    return result
+
+def save_terms(input_terms,output_dir=None):
+    '''save_terms
+    Parameters
+    =========
+    input_terms: list,dict
+        a list or dictionary of terms. if meta data are used to describe the  input_terms, provide the input_terms as a dictionary with a dictionary to define {"meta_label":"meta_value"}
+     output_dir: path
+        path to save output. If none, will just return json dictionary
+    Returns
+    =======
+    links: dict
+        dictionary structure with the following format (parallel to what many d3
+        algorithms use to define graphs)
+
+        {"nodes":[{"name":"node1"},
+                 {"name":"node2"}],
+         }
+
+    '''
+    # Not sure why anyone would do this, but might as well check
     nodes = []
     ids = []
     if isinstance(input_terms,str):
@@ -69,17 +114,7 @@ def save_terms(input_terms,output_dir=None,tag=None,relationships=None):
         print "Invalid input_terms, must be str, dict, or list."
         return
 
-    if relationships is not None:
-        for tup in relationships:
-            if tup[0].lower() or tup[1].lower() not in ids:
-                print "Entry %s has nodes not defined in input_terms!" %(tup)
-                return
-            links.append({"source":tup[0],"target":tup[1],"value":tup[2]})
-
-    result = {"nodes":nodes,"links":links}
+    result = {"nodes":nodes}
     if output_dir is not None:
-        if tag != None:
-            save_pretty_json(result,"%s/%s_terms.json" %(output_dir,tag))
-        else:
-            print "ERROR: Tag must be defined to save terms to file."
+            save_pretty_json(result,"%s/terms.json" %(output_dir))
     return result
