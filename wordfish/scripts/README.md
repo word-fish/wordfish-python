@@ -1,0 +1,1 @@
+This folder will be filled with job files, each with a list of commands, that can be submit to a slurm cluster, or run at once with launch. Scripts will be provided, for now the user can run however he/she pleases.

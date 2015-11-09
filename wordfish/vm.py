@@ -157,7 +157,7 @@ def generate_requirements(valid_plugins,app_dest):
 def setup_extraction(valid_plugins,app_dest,extraction_type,field_name,field_value="True"):
     '''
     setup_extractions will generate a run time script
-    directory in the base of the application folder, and then, for
+    directory in the application scripts folder, and then, for
     each plugin for which some field is True,
     write a line to a job script (that can be run with launch or slurm)
     to call the function.
@@ -167,19 +167,20 @@ def setup_extraction(valid_plugins,app_dest,extraction_type,field_name,field_val
 
     '''
     if extraction_type in ["relationships","corpus","terms"]:
-        script_directory = "%s/scripts" %app_dest
+        script_directory = "%s/wordfish/scripts" %app_dest
         if not os.path.exists(script_directory):
             os.mkdir(script_directory)
         extraction_script = "%s/run_extraction_%s.job" %(script_directory,extraction_type)
         for valid_plugin in valid_plugins:
             plugin = load_plugin(valid_plugin)[0]
             if plugin[field_name] == field_value:
+                # Redundant for now, but in preparation for different inputs
                 if extraction_type == "relationships":
-                    write_plugin_relationship_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+                    write_plugin_relationship_job(plugin["tag"],extraction_script)
                 elif extraction_type == "corpus":
-                    write_plugin_corpus_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+                    write_plugin_corpus_job(plugin["tag"],extraction_script)
                 elif extraction_type == "terms":
-                    write_plugin_terms_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+                    write_plugin_terms_job(plugin["tag"],extraction_script)
 
 def init_scripts(scripts_dir,output_base):
     '''init_scripts:

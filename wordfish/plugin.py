@@ -199,14 +199,14 @@ def move_plugins(valid_plugins,app_dest):
 
 # EXTRACTION JOBS ############################################################
 
-def write_plugin_relationship_job(tag,extraction_script,output_dir):
+def write_plugin_relationship_job(tag,extraction_script):
     line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
 
-def write_plugin_corpus_job(tag,extraction_script,output_dir):
+def write_plugin_corpus_job(tag,extraction_script):
     line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/corpus/%s\")'" %(tag,tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
 
-def write_plugin_terms_job(tag,extraction_script,output_dir):
+def write_plugin_terms_job(tag,extraction_script):
     line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
