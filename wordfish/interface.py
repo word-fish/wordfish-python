@@ -79,8 +79,10 @@ def validate():
         terms = get_terms(valid_plugins)
  
         return render_template('plugins.html',
-                                plugins=str(corpus),
+                                corpus=str(corpus),
                                 terms=str(terms),
+                                this_many_corpus = len(corpus),
+                                this_many_terms = len(terms),
                                 tmpdir=tmpdir,
                                 deploychoice=fields["deploychoice"])
 
