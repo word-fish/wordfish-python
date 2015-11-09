@@ -197,7 +197,16 @@ def move_plugins(valid_plugins,app_dest):
            print "Cannot move %s, will not be installed." %(valid_plugin)
     return moved_plugins
 
-def write_plugin_relationship_job(tag,extract_relationship_script,output_dir):
-    line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\
-%s\")'" %(tag,output_dir)
-    add_lines(script=extract_relationship_script,lines_to_add=[line_to_add])
+# EXTRACTION JOBS ############################################################
+
+def write_plugin_relationship_job(tag,extraction_script,output_dir):
+    line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
+    add_lines(script=extraction_script,lines_to_add=[line_to_add])
+
+def write_plugin_corpus_job(tag,extraction_script,output_dir):
+    line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/corpus/%s\")'" %(tag,tag)
+    add_lines(script=extraction_script,lines_to_add=[line_to_add])
+
+def write_plugin_terms_job(tag,extraction_script,output_dir):
+    line_to_add = "python -c 'from wordfish.plugins.%s import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
+    add_lines(script=extraction_script,lines_to_add=[line_to_add])

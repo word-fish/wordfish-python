@@ -4,7 +4,7 @@ functions for working with virtual machines, repos
 
 '''
 from wordfish.utils import copy_directory, get_template, save_template
-from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, load_plugin
+from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, write_plugin_terms_job, write_plugin_corpus_job, load_plugin
 from git import Repo
 import numpy
 import tempfile
@@ -49,8 +49,12 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
         # Copy valid plugins into app_repo
         move_plugins(valid_plugins,app_dest)
 
-        # Generate run commands for each of relationship extractions
-        setup_relationship_extractions(valid_plugins,app_dest)
+        # Generate run commands for each of corpus,terms,relationships
+        setup_extraction(valid_plugins,app_dest,"relationships","relationships")
+        setup_extraction(valid_plugins,app_dest,"terms","terms")
+        setup_extraction(valid_plugins,app_dest,"corpus","corpus")
+
+        #TODO: We will have a script here to run the analysis, after the above 3
 
     else:
         print "Folder exists at %s, cannot generate." %(battery_dest)
@@ -144,23 +148,73 @@ def generate_requirements(valid_plugins,app_dest):
     # Get requirements.txt to use as a template
     requirements = get_template("%s/requirements.txt" %(app_dest)).split("\n")
     new_requirements = numpy.unique(requirements + dependencies).tolist()
-    
+    new_requirements = [x for x in new_requirements if len(x) > 0]
+
     # Save new requirements
     save_template("%s/requirements.txt" %(app_dest),"\n".join(new_requirements))
 
-def setup_relationship_extractions(valid_plugins,app_dest):
+
+def setup_extraction(valid_plugins,app_dest,extraction_type,field_name,field_value="True"):
     '''
-    setup_relationship_extractions will generate a run time script
+    setup_extractions will generate a run time script
     directory in the base of the application folder, and then, for
-    each plugin for which relationship extraction is possible,
+    each plugin for which some field is True,
     write a line to a job script (that can be run with launch or slurm)
     to call the function.
+
+    field_name: The field name to be checked for a value
+    field_value: The value that must be specified to be included
+
     '''
-    script_directory = "%s/scripts" %app_dest
-    if not os.path.exists(script_directory):
-        os.mkdir(script_directory)
-    extract_relationship_script = "%s/run_extraction_relationships.job" %script_directory
-    for valid_plugin in valid_plugins:
-        plugin = load_plugin(valid_plugin)[0]
-        if plugin["relationships"] == "True":
-            write_plugin_relationship_job(plugin["tag"],extract_relationship_script,"%s/wordfish/scripts" %(app_dest))
+    if extraction_type in ["relationships","corpus","terms"]:
+        script_directory = "%s/scripts" %app_dest
+        if not os.path.exists(script_directory):
+            os.mkdir(script_directory)
+        extraction_script = "%s/run_extraction_%s.job" %(script_directory,extraction_type)
+        for valid_plugin in valid_plugins:
+            plugin = load_plugin(valid_plugin)[0]
+            if plugin[field_name] == field_value:
+                if extraction_type == "relationships":
+                    write_plugin_relationship_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+                elif extraction_type == "corpus":
+                    write_plugin_corpus_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+                elif extraction_type == "terms":
+                    write_plugin_terms_job(plugin["tag"],extraction_script,"%s/wordfish/scripts" %(app_dest))
+
+def init_scripts(scripts_dir,output_base):
+    '''init_scripts:
+    move job running scripts from template into user
+    scripts directory. Template substitutions will be done at
+    this step, to ensure that calling the init_scripts function
+    from a different folder will produce scripts to run with correct
+    analysis directory path
+    '''
+    installdir = get_installdir()
+    scripts_to_move = glob("%s/wordfish/scripts/*" %(installdir))
+    for script in scripts_to_move:
+        script_template = get_template(script)
+        script_template = sub_template(script_template,"[SUB_OUTPUTBASE_SUB]",output_base)  
+        script_name = os.path.basename(script)
+        script_copy = "%s/%s" %(scripts_dir,script_name)       
+        save_template(script_copy,script_template)              
+        
+
+def make_plugin_folders(analysis_dir):
+    '''
+    Makes output directories for all plugins defined in the package
+    for which a corpus, terms, or relationships extraction is defined.
+    '''
+    installdir = get_installdir()
+    installed_plugins = get_plugins("%s/wordfish/plugins" %(installdir),load=True)
+    folders = ["corpus","terms"]
+    for installed_plugin in installed_plugins:
+        tag = installed_plugin[0]["tag"]
+        make_plugin_folder(analysis_dir,"terms",tag,installed_plugin[0]["relationships"],"True")
+        for folder in folders:
+            make_plugin_folder(analysis_dir,folder,tag,installed_plugin[0][folder],"True")
+
+def make_plugin_folder(analysis_dir,folder,tag,field_name,field_value):
+    if field_name == field_value:
+        plugin_folder = "%s/%s/%s" %(analysis_dir,folder,tag)
+        if not os.path.exists(plugin_folder):
+            os.mkdir(plugin_folder)

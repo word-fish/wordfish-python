@@ -20,18 +20,6 @@ def save_pretty_json(dict_obj,output_file):
         json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
     return json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
 
-
-def init_scripts(scripts_dir):
-    '''init_scripts:
-    move job running scripts from template into user
-    scripts directory
-    '''
-    installdir = get_installdir()
-    scripts_to_move = glob("%s/wordfish/scripts/*")
-    for script in scripts_to_move:
-        script_name = os.path.basename(script)
-        shutil.copyfile(script,"%s/%s" %(scripts_dir,script_name))
-
 def get_installdir():
     return os.path.dirname(os.path.abspath(__init__.__file__))
 
