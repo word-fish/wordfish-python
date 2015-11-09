@@ -13,7 +13,7 @@ def import_files(files,table_name):
         files = [files]
     for import_file in files:
         if os.path.exists(import_file):
-        os.system('deepdive sql "COPY %s FROM STDIN CSV" <%s' %(table_name,import_file))
+            os.system('deepdive sql "COPY %s FROM STDIN CSV" <%s' %(table_name,import_file))
 
 def create_all_tables():
     create_mentions_table()

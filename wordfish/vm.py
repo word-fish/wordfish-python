@@ -6,6 +6,7 @@ functions for working with virtual machines, repos
 from wordfish.utils import copy_directory, get_template, save_template, get_installdir
 from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, write_plugin_terms_job, write_plugin_corpus_job, load_plugin
 from git import Repo
+from glob import glob
 import numpy
 import tempfile
 import shutil
