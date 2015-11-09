@@ -9,8 +9,6 @@
 # installation steps will not be necessary. User instructions will
 # be provided in documentation to give details to this.
 
-
-# VARIABLES FILLED IN FROM DEEPDIVE-PYTHON
 WORK=$1
 
 # Installation python package
