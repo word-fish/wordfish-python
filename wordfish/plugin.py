@@ -204,9 +204,9 @@ def write_plugin_relationship_job(tag,extraction_script):
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
 
 def write_plugin_corpus_job(tag,extraction_script):
-    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/corpus/%s\")'" %(tag,tag)
+    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_corpus; extract_corpus(\"[SUB_OUTPUTBASE_SUB]/corpus/%s\")'" %(tag,tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
 
 def write_plugin_terms_job(tag,extraction_script):
-    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
+    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_terms; extract_terms(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
