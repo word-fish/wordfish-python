@@ -197,7 +197,7 @@ def init_scripts(scripts_dir,output_base):
         script_template = get_template(script)
         script_template = sub_template(script_template,"[SUB_OUTPUTBASE_SUB]",output_base)  
         script_name = os.path.basename(script)
-        script_copy = "%s/%s" %(output_base,script_name)       
+        script_copy = "%s/scripts/%s" %(output_base,script_name)       
         save_template(script_copy,script_template)              
         
 
