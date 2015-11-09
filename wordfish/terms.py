@@ -8,6 +8,7 @@ to search for in corpus
 
 '''
 import nltk
+import os
 import pandas
 from wordfish.utils import save_pretty_json
 
