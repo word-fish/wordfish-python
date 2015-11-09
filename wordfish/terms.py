@@ -67,14 +67,12 @@ def save_relationships(input_terms,relationships,output_dir=None):
 
     # Save relationships
     for tup in relationships:
-        if tup[0].lower() or tup[1].lower() not in ids:
-            print "Entry %s has nodes not defined in input_terms!" %(tup)
-            return
-        links.append({"source":tup[0],"target":tup[1],"value":tup[2]})
+        if tup[0].lower() and tup[1].lower() in ids:
+            links.append({"source":tup[0],"target":tup[1],"value":tup[2]})
 
-    result = {"links":links}
+    result = {"edges":links}
     if output_dir is not None:
-        save_pretty_json(result,"%s/%s_relationships.json" %(output_dir))
+        tmp = save_pretty_json(result,"%s/term_relationships.json" %(output_dir))
     return result
 
 def save_terms(input_terms,output_dir=None):
@@ -117,5 +115,5 @@ def save_terms(input_terms,output_dir=None):
 
     result = {"nodes":nodes}
     if output_dir is not None:
-            save_pretty_json(result,"%s/terms.json" %(output_dir))
+        tmp = save_pretty_json(result,"%s/terms.json" %(output_dir))
     return result
