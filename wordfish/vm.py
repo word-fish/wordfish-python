@@ -3,7 +3,7 @@ vm: part of the wordfish python package
 functions for working with virtual machines, repos
 
 '''
-from wordfish.utils import copy_directory, get_template, save_template
+from wordfish.utils import copy_directory, get_template, save_template, get_installdir
 from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, write_plugin_terms_job, write_plugin_corpus_job, load_plugin
 from git import Repo
 import numpy
@@ -206,7 +206,7 @@ def make_plugin_folders(analysis_dir):
     for which a corpus, terms, or relationships extraction is defined.
     '''
     installdir = get_installdir()
-    installed_plugins = get_plugins("%s/wordfish/plugins" %(installdir),load=True)
+    installed_plugins = get_plugins("%s/plugins" %(installdir),load=True)
     folders = ["corpus","terms"]
     for installed_plugin in installed_plugins:
         tag = installed_plugin[0]["tag"]

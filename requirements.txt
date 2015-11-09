@@ -2,7 +2,6 @@ numpy
 nltk
 flask
 gitpython
-beautifulsoup4
 gensim
 graphlab-create
 xmltodict

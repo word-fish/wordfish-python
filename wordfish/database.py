@@ -8,7 +8,7 @@ part of the wordfish python package: extracting relationships of terms from corp
 
 import os
 
-def import_files(files,table_name)
+def import_files(files,table_name):
     if isinstance(files,str): 
         files = [files]
     for import_file in files:
@@ -23,11 +23,13 @@ def create_all_tables():
 
 
 def create_table():
-
+    print "WRITEME"
 
 
 def make_mentions_table():
+    print "WRITEME"
 
 
 def make_sentences_table():
+    print "WRITEME"
 
