@@ -42,26 +42,38 @@ A custom application is generated for you!
 
 This will produce a folder for you to drop in your cluster environment.
 
-### 2. Install dependencies
+### 2. Install
 
-Drop the folder into your home directory of your cluster environment. Run the install script to install the package itself, and start your analyses. The pipeline is a mixture of local processing, and submitting scripts to a SLURM environment for larger jobs. The first (and only) argument is the project directory where you want your data and outputs to live. 
+Drop the folder into your home directory of your cluster environment. Run the install script to install the package itself, and generate the output folder structure. The only argument that you need to supply is the base of your output directory:
+
+      WORK=/scratch/users/vsochat/wordfish
+      bash install.sh $WORK
+
+All scripts for you to run are in the scripts folder here:
+
+
+      cd $WORK/scripts
+
+Each of these files corresponds to a step in the pipeline, and is simply a list of commands to be run in parallel. You can use launch, or submit each command to a SLURM cluster. There will eventually be scripts provided for easily running with your preferred method.
+
 
 #### Project Current Status
-[Plugins](https://github.com/word-fish/wordfish-plugins) are being developed, and pipelines tested. When this is finished, the functionality will be integrated into the application generation. It is not yet decided if a database will be used for the initial processing. For deployment options, it makes sense to deploy the module folder to a cluster environment, and then perhaps deploy an application with docker. I have not yet decided.
+[Plugins](https://github.com/word-fish/wordfish-plugins) are being developed, and pipelines tested. When this is finished, the functionality will be integrated into the application generation. It is not yet decided if a database will be used for the initial processing. For deployment options, it makes sense to deploy the module folder to a cluster environment, and then perhaps deploy an application with docker. I have not yet decided. I have also not yet implemented the inference, but I have a good idea of how I'm going to do it.
+
+           
+### 3. Running the Pipeline
+
+After the installation of your custom application is complete, this install script simply runs `run.py`, which generates all output folders and running scripts. It used to be the case that this script did some preprocessing, but I have moved all these steps to be specified in the files in the `scripts` folder. This means that you have a few options for running:
+
+- sumbit the commands in serial, locally. You can run a job file with bash, `bash run_extraction_relationships.job`
+- submit the commands to a launch cluster, something like `launch -s run_extraction_relationships.job`
+- submit the commands individually to a slurm cluster. This will mean reading in the file, and submitting each script with a line like `sbatch -p normal -j myjob.job [command line here]`
 
       
-      WORK=/scratch/users/vsochat/wordfish-nlp
-      bash install.sh $WORK
-      
-
-### 3. Prepare cluster jobs
-
-After installations are complete, this install script will also call `run.py`, which will do preliminary work preparing all input files and corpus. This is just preparing job files and is not hugely computationally intensive, and could probably be done on a screen on a home node. If you feel antsy about it, you can connect to a dev node. If you look at the run.py script, you will see commands appended to prepare the corpus and terms that you specified. This is going to generate the following file structure in your project folder (and files that will eventually be produced are shown):
+### 4. Infrastructure
+The jobs are going to generate output to fill in the following file structure in your project base folder (and files that will eventually be produced are shown):
 
       WORK
-          SOFTWARE
-              wordfish
-          APP
               corpus
                   corpus1
                       12345_sentences.txt
@@ -70,22 +82,16 @@ After installations are complete, this install script will also call `run.py`, w
                       12345_sentences.txt
                       12346_sentences.txt
               terms
-                  terms1
-                  terms2
+                  terms1_terms.txt
+                  terms2_relationships.txt
 
-              jobs
-                  run1_corenlp.txt
-                  run4_features.txt
-                  run5_inference.txt
               scripts
+                  run_extraction_corpus.job
+                  run_extraction_relationships.job
+                  run_extraction_terms.job
 
-The folders are generated dynamically for each corpus and terms plugin based on the "tag" variable in the plugin's config. The tag names for the plugins are the only unique requirement, and the creator of the plugin can either decide a meaningful unique id for the sentences output, or not specify and let deepdive.corpus decide. This doesn't matter until all extractions are complete, at which time a unique ID is assigned to the files.
 
-### 4. Run cluster jobs
-
-Most of these files are not generated with the run.py script - the run.py script generates jobs to be run in parallel to produce these files (in the "jobs" directory), and some of these jobs require generic scripts (in the "scripts" directory) that use wordfish-python functions in the cluster environment. The high level idea is that we package each step of the pipeline into a set of jobs that can be run in parallel (specified as lines in each file in the "jobs" directory). This means that after running run.py, you will have sentences for each corpus, a term data structure for each data structure, and a folder filled with "jobs" to submit to a cluster, and run in the order specified when the previous step has completed. This package provides functions for running these commands in a slurm (submission) environment, or a launch system (all at once) (details to follow).
-
-(Note: For now, since obtaining the corpus and parsing to sentences is not computationally or time intensive, this is also done by the run script, but this could also be moved to be a cluster task.)
+The folders are generated dynamically by the `run.py` script for each corpus and terms plugin based on the "tag" variable in the plugin's config. Relationships, by way of being associated with terms, are stored in the equivalent folder, and the process is only separate because it is not the case that all plugins for terms can have relationships defined. The corpus are kept separate at this step as the output has not been parsed into the wordfish standard to allow integration across corpus and terminologies, at which point wordfish unique IDs will be assigned. 
 
 ** under development **
 more details to come as they are figured out, coded, etc.
@@ -94,14 +100,8 @@ more details to come as they are figured out, coded, etc.
 
 #### Deployment Options
 
-##### Virtual Machine
-The user can select to deploy to a vagrant-vm, or amazon-aws virtual machine. I am also considering docker. This will mean (for now) that all processing will be done in serial (or with a small job manager). 
+Right now the only option (that works) is to generate a folder and install on a cluster, however I have plans to generate a version to install and run on a virtual machine, either with vagrant (local) or vagrant with amazon web services, and I am also thinking about docker for easy cloud deployment.
 
-##### Cluster
-The user can select to deploy an analysis application, meaning a folder with an install script to deploy in a cluster environment. I will start with two options for job managers: SLURM, and "launch" (meaning using a grid system set up with a SLURM cluster). For launch, commands will be executed as lines in a single file. For SLURM, commands will be sbatch commands submit from a particular user when jobs are allowed.
-
-#### Local
-If the user wants to run things locally, the same folder can be deployed (sans cluster submission), but I don't see why anyone would want to do this.
 
 ### Standards
 Standards will be different kinds of file structures that the module will know how to parse. Including:
@@ -110,11 +110,7 @@ Standards will be different kinds of file structures that the module will know h
 - nifti: is a brainmap image, for an atlas or brain map (also structured, an XML file and nifti image)
 
 ### Plugins 
-Plugins will be resources from which to derive corpus and/or terminology (terms). Initial plugins will include the following:
+Plugins will be resources from which to derive corpus and/or terminology (terms). Optionally, a terminology can also have relationships. To see an initial list of available plugins, see the [wordfish-plugins](http://www.github.com/word-fish/wordfish-plugins) repo.
 
-- wordnet: people might just want a subset of "normal word" terms deemed important by way of relationships in wordnet
-- reddit: in my mind, is a rich source of behavioral phenotypes
-- pubmed: many plugins will require downloading abstracts or full text from here
-- cognitiveatlas: an ontology of cognitive concepts, tasks, disorders
-- neurosynth: database of significant coordinates extracted from a set of pubmed abstracts, and associated features (terms)
-- neurovault: database of statistical brain maps (corpus)
+### Data
+We will eventually want to relate these analyses to data, such as brain imaging data. For example, NeuroVault is a database of whole-brain statistical maps with annotations for terms from the cognitive atlas, so this means we can link brain imaging data to terms from the cognitive atlas ontology, and either of the fsl or fma_nif plugins, which both define brain regions. Toward this aim a separate [wordfish-data](http://www.github.com/word-fish/wordfish-data) repo has been added. Nothing has been developed here yet, but it's in the queue.

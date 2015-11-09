@@ -19,6 +19,6 @@ scripts_directory = make_directory("%s/scripts" %(analysis_dir))
 # These are fine to re-run, if already done will not cause harm
 download_nltk()
 make_plugin_folders(analysis_dir)
-init_scripts(scripts_directory,corpus_output,analysis_dir)
+init_scripts(scripts_directory,analysis_dir)
 
 print "Scripts are generated in scripts folder. Extractions of terms, corpus, and relationships can be done in parallel, but must be done before run_analysis_setup.job [NOT YET WRITTEN] and before run_inference.job [NOT YET WRITTEN]

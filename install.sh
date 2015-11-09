@@ -17,13 +17,5 @@ WORK=$1
 # Installation python package
 python setup.py install --user
 
-# Set up software directory in work
-CURRENT_DIRECTORY=$PWD
-cd $WORK
-mkdir SOFTWARE
-mkdir APP
-mkdir APP/input
-cd $CURRENT_DIRECTORY
-
 # Run the script to call the application
 python run.py $WORK
