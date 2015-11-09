@@ -4,7 +4,7 @@ functions for working with virtual machines, repos
 
 '''
 from wordfish.utils import copy_directory, get_template, save_template
-from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job
+from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, load_plugin
 from git import Repo
 import numpy
 import tempfile
@@ -44,7 +44,7 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
             valid_plugins = subset_plugins  
 
         # Generate the setup.py from template to include all python dependencies for plugins
-        generate_setup(valid_plugins,app_dest)
+        generate_requirements(valid_plugins,app_dest)
 
         # Copy valid plugins into app_repo
         move_plugins(valid_plugins,app_dest)
@@ -119,9 +119,9 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
         return "postgresql://wordfish:wordfish@localhost:5432/wordfish"
 
 
-def generate_setup(valid_plugins,app_dest):
+def generate_requirements(valid_plugins,app_dest):
     '''
-    generate_setup will generate a custom setup.py from a template
+    generate_requirements will generate a custom setup.py from a template
     this will include the python dependencies for valid plugins
     '''
     plugin_folder = os.path.dirname(valid_plugins[0])
@@ -141,19 +141,12 @@ def generate_setup(valid_plugins,app_dest):
         dependencies = dependencies + python_dep
     dependencies = numpy.unique(dependencies).tolist()
 
-    # Get setup.py from app_dest to use as a template
-    setup = get_template("%s/setup.py" %(app_dest)).split("\n")
-    expression = re.compile("install_requires")
-    startre = re.compile("[[]")
-    for l in range(0,len(setup)):
-        if expression.search(setup[l]):
-            start = startre.search(setup[l]).start()
-            old_deps = [x.strip("'").strip("'") for x in  setup[l][start:-1].strip(']').strip('[').split(",")]
-            new_deps = numpy.unique(dependencies + old_deps).tolist()
-            setup[l] = "%s%s" %(setup[l][0:start],str(new_deps))
+    # Get requirements.txt to use as a template
+    requirements = get_template("%s/requirements.txt" %(app_dest)).split("\n")
+    new_requirements = numpy.unique(requirements + dependencies).tolist()
     
-    # Save template
-    save_template("%s/setup.py" %(app_dest),"\n".join(setup))
+    # Save new requirements
+    save_template("%s/requirements.txt" %(app_dest),"\n".join(new_requirements))
 
 def setup_relationship_extractions(valid_plugins,app_dest):
     '''
@@ -169,5 +162,5 @@ def setup_relationship_extractions(valid_plugins,app_dest):
     extract_relationship_script = "%s/run_extraction_relationships.job" %script_directory
     for valid_plugin in valid_plugins:
         plugin = load_plugin(valid_plugin)[0]
-        if plugin[0]["relationships"] == "True":
-            write_plugin_relationship_job(plugin[0]["tag"],extract_relationship_script,"%s/wordfish/scripts" %(app_dest))
+        if plugin["relationships"] == "True":
+            write_plugin_relationship_job(plugin["tag"],extract_relationship_script,"%s/wordfish/scripts" %(app_dest))
