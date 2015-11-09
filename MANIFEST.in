@@ -1,2 +1,2 @@
-recursive-include deepdive/templates *
-recursive-include deepdive/static *
+recursive-include wordfish/templates *
+recursive-include wordfish/static *

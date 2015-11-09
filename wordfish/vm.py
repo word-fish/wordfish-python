@@ -168,6 +168,6 @@ def setup_relationship_extractions(valid_plugins,app_dest):
         os.mkdir(script_directory)
     extract_relationship_script = "%s/run_extraction_relationships.job" %script_directory
     for valid_plugin in valid_plugins:
-        plugin = load_plugins(valid_plugin)[0]
+        plugin = load_plugin(valid_plugin)[0]
         if plugin[0]["relationships"] == "True":
             write_plugin_relationship_job(plugin[0]["tag"],extract_relationship_script,"%s/wordfish/scripts" %(app_dest))

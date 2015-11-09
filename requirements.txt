@@ -5,3 +5,4 @@ gitpython
 beautifulsoup4
 gensim
 graphlab-create
+xmltodict

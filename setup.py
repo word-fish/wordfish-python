@@ -4,6 +4,10 @@ import os
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+# Get requires from requirements.txt
+reqs = [line.strip() for line in open('requirements.txt').readlines()]
+requirements = list(filter(None, reqs))
+
 # Get the long description from the relevant file
 with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -34,7 +38,7 @@ setup(
     long_description=long_description,
     keywords='wordfish, nlp, text parsing',
 
-    install_requires = ['numpy','gitpython','nltk','pandas'],
+    install_requires = requirements,
 
     entry_points = {
         'console_scripts': [

@@ -4,6 +4,7 @@ part of the wordfish python tools
 
 '''
 
+from urllib2 import Request, urlopen, HTTPError
 from glob import glob
 import errno
 import tarfile
@@ -182,6 +183,19 @@ def add_lines(script,lines_to_add):
     filey = open(script,"wb")
     filey.writelines("\n".join(lines))
     filey.close()
+
+# INTERNET ################################################
+def get_url(url):
+    request = Request(url)
+    response = urlopen(request)
+    return response.read()
+
+def get_json(url):
+    '''Return general json'''
+    print url
+    json_single = get_url(url)
+    return json.loads(json_single.decode("utf-8"))
+
 
 def has_internet_connectivity():
     """has_internet_connectivity

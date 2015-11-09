@@ -6,6 +6,8 @@ xml: general functions for parsing xml
 import re
 import os
 import tarfile
+import xmltodict
+from wordfish.utils import get_url
 
 def get_xml_tree(tarball):
     '''get_xml_tree:
@@ -65,6 +67,11 @@ def extract_xml_compressed(tarball):
             file_object = tar.extractfile(tar_info)
             return file_object.read().replace('\n', '')
 
+
+def read_xml_url(url):
+    page = get_url(url)
+    return xmltodict.parse(page)
+    
 
 def read_xml(xml):
     '''read_xml
