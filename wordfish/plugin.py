@@ -117,7 +117,7 @@ def get_terms(plugins,return_field=None):
     return terms
 
 
-def get_plugins(plugin_repo=None,load=False,validate=True):
+def get_plugins(plugin_repo=None,load=False):
     '''get_plugins from a downloaded wordfish-plugins folder
     download plugin repo to destination folder
     Parameters
@@ -131,10 +131,9 @@ def get_plugins(plugin_repo=None,load=False,validate=True):
         tmpdir = custom_app_download(repo_types=["plugins"])
         plugin_repo = "%s/plugins" %(tmpdir)
 
-    valid_plugins = find_directories(plugin_repo)
-    if validate == True:
-        valid_plugins = [p for p in valid_plugins if validate(p)]
-        print "Found %s valid plugins" %(len(valid_plugins))
+    plugins = find_directories(plugin_repo)
+    valid_plugins = [p for p in plugins if validate(p)]
+    print "Found %s valid plugins" %(len(valid_plugins))
     if load == True:
         valid_plugins = load_plugins(valid_plugins)
     return valid_plugins
