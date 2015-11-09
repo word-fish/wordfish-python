@@ -17,8 +17,7 @@ import __init__
 
 def save_pretty_json(dict_obj,output_file):
     with open(output_file, 'w') as outfile:
-        json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
-    return json.dumps(dict_obj, sort_keys=True,indent=4, separators=(',', ': '))
+        json.dump(dict_obj,outfile)
 
 def get_installdir():
     return os.path.dirname(os.path.abspath(__init__.__file__))
