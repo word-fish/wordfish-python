@@ -15,22 +15,6 @@ import pandas
 import gensim
 import re
 
-class TrainSentences(object):
-    def __init__(self, text_files):
-       self.files = text_files
-    def __iter__(self):
-        for input_file in self.files:
-            for text in file(input_file, "rb"):
-                for line in text2sentences(text):            
-                    words = sentence2words(line)
-                    if len(words) < 3: continue    
-                    yield words
-
-def train_word2vec_model(text_files):
-    sentences = TrainSentences(text_files)
-    model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
-    return model
-
 def text2sentences(text,remove_non_english_chars=True):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')    
     if remove_non_english_chars:

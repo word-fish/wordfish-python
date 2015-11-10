@@ -183,6 +183,8 @@ def get_json(url):
     json_single = get_url(url)
     return json.loads(json_single.decode("utf-8"))
 
+def read_json(json_file):
+    return json.load(open(json_file,"rb"))
 
 def has_internet_connectivity():
     """has_internet_connectivity

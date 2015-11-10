@@ -1,3 +1,12 @@
+'''
+run_slurm.py
+
+A basic script to read in a list of commands, parse into slurm job scripts,
+and run the jobs. Modify the bottom of the script to change the default
+submission args.
+
+'''
+
 import os
 import sys
 script_dir = os.path.dirname(os.path.realpath(__file__))

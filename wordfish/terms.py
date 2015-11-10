@@ -7,10 +7,10 @@ this set of functions works with different plugins (in plugins folder) to produc
 to search for in corpus
 
 '''
+from wordfish.utils import save_pretty_json, find_directories, read_json
+import pandas
 import nltk
 import os
-import pandas
-from wordfish.utils import save_pretty_json
 
 def download_nltk():
     '''download_nltk
@@ -116,4 +116,49 @@ def save_terms(input_terms,output_dir=None):
     result = {"nodes":nodes}
     if output_dir is not None:
         tmp = save_pretty_json(result,"%s/terms.json" %(output_dir))
+    return result
+
+
+def merge_terms(analysis_dir):
+    '''
+    For all terms defined, and relationships for the terms, parse into a single data structure
+    This won't work for larger datasets (we will use a database) but it will for testing.
+
+        nodes:
+
+            {"[plugin]::[uid]"}
+    '''
+    nodes = dict()
+    edges = dict()
+
+    terms_dir = "%s/terms" %(os.path.abspath(analysis_dir))
+    if os.path.exists(terms_dir):
+        term_plugins = find_directories(terms_dir)
+        for term_plugin in term_plugins:
+            plugin_name = os.path.basename(term_plugin)
+
+            # Here we parse together terms
+            if os.path.exists("%s/terms.json" %term_plugin):
+                terms_json = read_json("%s/terms.json" %term_plugin)["nodes"]
+                for node in terms_json:
+                    uid = "%s::%s" %(plugin_name,node["uid"])
+                    nodes[uid] = node
+
+            # Here we parse together relationships
+            # Currently only supported for terms within the same family
+            if os.path.exists("%s/term_relationships.json" %term_plugin):
+                terms_json = read_json("%s/term_relationships.json" %term_plugin)["edges"]
+                for relation in terms_json:
+                    uid_1 = "%s::%s" %(plugin_name,relation["source"])
+                    uid_2 = "%s::%s" %(plugin_name,relation["target"])
+                    relation_uid = "%s<>%s" %(uid_1,uid_2)
+                    edges[relation_uid] = {"source": uid_1,
+                                           "target": uid_2,
+                                           "value": relation["value"]}
+
+            result = {"nodes":nodes,"edges":edges}
+    
+    # Return the result to user with all edges and nodes defined
+    if analysis_dir is not None:
+        tmp = save_pretty_json(result,"%s/terms/terms.json" %(analysis_dir))
     return result
