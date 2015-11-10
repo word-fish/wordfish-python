@@ -6,7 +6,8 @@ this set of functions works with different plugins (in plugins folder) to produc
 for parsing.
 
 '''
-import pandas
+
+from textblob import TextBlob
 
 def save_sentences(articles,output_dir="."):
     '''save_sentences: 
@@ -23,7 +24,7 @@ def save_sentences(articles,output_dir="."):
     '''
     if isinstance(articles,dict):
         for uid, text in articles.iteritems():
-            save_sentences_single(uid,text)
+            save_sentences_single(uid,text,output_dir)
 
     elif isinstance(articles,list):
         for uid in range(len(articles)):
