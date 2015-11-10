@@ -8,7 +8,7 @@ from wordfish.utils import make_directory
 from wordfish.terms import download_nltk
 
 # DIRECTORIES #####################################################################
-analysis_dir = sys.argv[1]
+analysis_dir = os.path.abspath(sys.argv[1])
 # /work/02092/vsochat/wrangler/
 #corenlp_dir="/%s/SOFTWARE/stanford-corenlp-full-2015-04-20" %(analysis_dir)
 corpus_output = make_directory("%s/corpus" %(analysis_dir))
