@@ -2,8 +2,8 @@
 run_slurm.py
 
 A basic script to read in a list of commands, parse into slurm job scripts,
-and run the jobs. Modify the bottom of the script to change the default
-submission args.
+and run the jobs. This will be improved! For now, modify the bottom of the 
+script to change the default submission args.
 
 '''
 
