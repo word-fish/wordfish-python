@@ -21,6 +21,7 @@ For now, the method is as follows:
 # First train simple word2vec model with different corpus
 from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv
 from wordfish.corpus import get_corpus
+from wordfish.terms import get_terms
 from wordfish.utils import mkdir
 import sys
 
@@ -47,3 +48,10 @@ models["all"] = train_word2vec_model(combined_sentences)
 # Export models to tsv, and save
 save_models(models,base_dir)
 export_models_tsv(models,base_dir)
+
+# TESTING TESTING TESTING
+
+# Get all terms
+terms = merge_terms(analysis_dir)
+
+

@@ -8,6 +8,7 @@ to search for in corpus
 
 '''
 from wordfish.utils import save_pretty_json, find_directories, read_json
+from uuid import uuid4
 import pandas
 import nltk
 import os
@@ -101,8 +102,9 @@ def save_terms(input_terms,output_dir=None):
         input_terms = [input_terms]
     if isinstance(input_terms,list):
         input_terms = [x.lower() for x in input_terms]
-        for term in input_terms:
-            nodes.append({"name":term.lower()})
+        for t in range(len(input_terms)):
+            term = input_terms[t]
+            nodes.append({"name":term.lower(),"uid":str(t)})
             ids.append(term.lower())
     elif isinstance(input_terms,dict):
         for node, meta in input_terms.iteritems():
@@ -141,7 +143,11 @@ def merge_terms(analysis_dir):
             if os.path.exists("%s/terms.json" %term_plugin):
                 terms_json = read_json("%s/terms.json" %term_plugin)["nodes"]
                 for node in terms_json:
-                    uid = "%s::%s" %(plugin_name,node["uid"])
+                    if "uid" in node:
+                        uid = "%s::%s" %(plugin_name,node["uid"])
+                    else:
+                        feature_name = node["name"].replace(" ","_")
+                        uid = "%s::%s" %(plugin_name,feature_name) 
                     nodes[uid] = node
 
             # Here we parse together relationships
