@@ -47,7 +47,7 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
     output_dir: path
         full path to a plugins corpus directory
     '''
-    output_file = "%s_sentences.txt" %(output_dir)
+    output_file = "%s/sentences.txt" %(output_dir)
     filey = open(output_file,"wb")
     filey.write('%s|"<text>' %uid)
     blob = TextBlob(text)
