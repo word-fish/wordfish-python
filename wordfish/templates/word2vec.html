@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+  <head>
+        <title>Wordfish Model Similarity Matrix</title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+        <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='font-awesome/css/font-awesome.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static',filename='css/form-elements.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="{{ url_for('static',filename='ico/favicon.ico') }}">
+
+    <style>
+ 
+      body {
+          font-family: 'Roboto', sans-serif;
+      }
+      rect.bordered {
+        stroke: #E6E6E6;
+        stroke-width:2px;   
+      }
+
+      text.mono {
+        font-size: 9pt;
+        font-family: 'Roboto', sans-serif lower-case;
+        fill: #aaa;
+      }
+
+      text.yaxis {
+        fill: #000;
+      }
+
+      text.xaxis {
+        fill: #000;
+      }
+
+      footer {
+          padding-left:20px;
+          padding-bottom:10px;
+      }
+      .d3-tip {
+         line-height: 1;
+         font-weight: bold;
+         padding: 12px;
+         background: rgba(0, 0, 0, 0.8);
+         color: #fff;
+         border-radius: 2px;
+       }
+
+       /* Creates a small triangle extender for the tooltip */
+       .d3-tip:after {
+         box-sizing: border-box;
+         display: inline;
+         font-size: 10px;
+         width: 100%;
+         line-height: 1;
+         color: rgba(0, 0, 0, 0.8);
+         content: "\25BC";
+         position: absolute;
+         text-align: center;
+        }
+
+        /* Style northward tooltips differently */
+        .d3-tip.n:after {
+          margin: -1px 0 0 0;
+          top: 100%;
+          left: 0;
+        }
+
+    </style>
+
+    </head>
+
+    <body>
+        <!-- Top menu -->
+	    <nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
+                <div class="container">
+		    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar-1">
+                            <span class="sr-only">Toggle navigation</span>
+			    <span class="icon-bar"></span>
+			    <span class="icon-bar"></span>
+			    <span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" style="height:255px; width:300px" href="index.html">Configure your Wordfish Application</a>
+		    </div>
+	   	    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="top-navbar-1">
+	                <ul class="nav navbar-nav navbar-right">
+			    <li>
+			        <span class="li-text">Ways to</span> 
+				    <a href="#"><strong> contact</strong></a> 
+				    <span class="li-text"> us:</span> 
+				    <span class="li-social">
+					<a href="#"><i class="fa fa-envelope"></i></a> 
+				    </span>
+			    </li>
+			</ul>
+		    </div>
+                </div>
+	    </nav>
+
+    <div class="row" style="margin-top:20px;margin-left:40px">
+
+    {% for input_file in input_files %}
+        <a href="?data={{ input_file }}"><button class="btn btn-default" type="button">{{ input_file }}</button></a>
+    {% endfor %}
+                   
+    </div>
+
+    <div class="row" style="margin-top:20px;margin-left:20px">
+        <div class="col-md-12">
+            <h1 class="reddit">Word2Vec Model Similarity Matrices</h1>
+	    <div id="chart"></div>
+        </div>
+    </div>
+
+    <script>
+
+    // Here is a funcion to get variables from the URL - the subreddit name
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+     }
+
+     //Get json name from the browser url
+     var tsv_data = getUrlVars()
+
+     if (typeof tsv_data["data"] == 'undefined'){ tsv_data = "neurosynth.tsv";}
+     else { tsv_data = tsv_data["data"].replace("/",""); }
+
+     document.getElementsByClassName("reddit")[0].textContent = "Word2Vec Similarity Matrices: " + tsv_data
+
+     var margin = { top: 20, right: 0, bottom: 20, left: 100 },
+          width = 1600 - margin.left - margin.right,
+          height = 1600 - margin.top - margin.bottom,
+          gridSize = Math.floor(width / 163),
+          legendElementWidth = gridSize*2,
+          buckets = 9,
+          colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"] // alternatively colorbrewer.YlGnBu[9]       
+          labels = ["hypochondriac","obsessive-compuls","disquiet","schizophren","insight","diffid","sleepi","brood","tire","sensit","activ","deliri","self-destruct","sympathet","decis","comprehens","persuas","unretent","letharg","gloomi","punctual","express","clang","hardwork","tens","expediti","arous","ambiti","adventur","cranki","strang","apathet","organ","realist","hostil","abash","accommod","reactiv","perfectionist","heed","popular","alogia","quick-wit","hallucin","studiou","restless","meticul","invinc","dead","slowdown","crave","respons","aloof","reserv","agit","nocturn","patholog","constip","amus","reclus","consecut","careless","impuls","famish","egotist","individualist","aggress","backach","ration","weak","ad-lib","eclect","nervou","care","pushov","decept","alon","contented","drug","honest","paranoid","hopeless","social","healthi","caprici","routin","curiou","emot","apt","creativ","hyperact","weather","resili","blank","better","worthless","breathless","faint","bizarr","happi","pleaser","stuck","gaze","averag","autonom","nauseat","compuls","listen","frenzi","relax","repetit","cautiou","impati","eat","present","religi","indrawn","target","procrastin","distract","optimist","misunderstood","control","prompt","contempl","recept","frighten","delusion","grandios","sad","fail","critic","anhedonia","unreli","coher","empath","dereal","imagin","confus","anxiou","econom","scholarli","incoher","exhaust","product","energet","brokenheart","blame","hazard","intrus","intens","plan","fickl","retard","practic","guilti","self-assur","moral","thought","inform","digress","clean","idiosyncrasi","law-abid"]
+          
+      // Tooltips
+      var tip = d3.tip()
+       .attr('class', 'd3-tip')
+       .offset([-10,10])
+       .html(function(d) {
+           return "<div class='row' style='margin-left:14px; margin-right:14px'><strong>P(" + d.predicted + "|" + d.actual + ") = " + Math.round(d.value * 100) / 100 +"</div>";
+       })
+
+      d3.tsv(tsv_data + "_co-occurrence.tsv",
+        function(d) {
+          return {
+            actual: d.probof,
+            predicted: d.given,
+            x: +d.x,
+            y: +d.y,
+            value: +d.prob
+          };
+        },
+
+        function(error, data) {
+          var colorScale = d3.scale.quantile()
+              .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+              .range(colors);
+
+          var svg = d3.select("#chart").append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          // Call tooltips function
+          svg.call(tip);
+
+          var xLabels = svg.selectAll(".xLabel")
+              .data(labels)
+              .enter().append("text")
+                .text(function (d) { return d.toLowerCase(); })
+                .attr("x", 0)
+                .attr("y", function (d, i) { return i * gridSize; })
+                .style("text-anchor", "end")
+                .attr("transform", "translate(-6," + gridSize / 1.5 + ")")
+                .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "xLabel mono axis yaxis" : "xLabel mono axis"); });
+
+          var heatMap = svg.selectAll(".count")
+              .data(data)
+              .enter().append("rect")
+              .attr("x", function(d) { return (d.y - 1) * gridSize; })
+              .attr("y", function(d) { return (d.x - 1) * gridSize; })
+              .attr("rx", 4)
+              .attr("ry", 4)
+              .attr("class", "count bordered")
+              .attr("width", gridSize)
+              .attr("height", gridSize)
+              .style("fill", colors[0])
+              .on('mouseout.tip', tip.hide)
+              .on('mouseover.tip', tip.show);
+
+          heatMap.transition().duration(1000)
+              .style("fill", function(d) { return colorScale(d.value); });
+
+          heatMap.append("title").text(function(d) { return d.value; });
+              
+          var legend = svg.selectAll(".legend")
+              .data([0].concat(colorScale.quantiles()), function(d) { return d; })
+              .enter().append("g")
+              .attr("x",0)
+              .attr("y",-1000)
+              .attr("class", "legend");
+
+          legend.append("rect")
+            .attr("x", function(d, i) { return legendElementWidth * i; })
+            .attr("y", height)
+            .attr("width", legendElementWidth)
+            .attr("height", gridSize / 2)
+            .style("fill", function(d, i) { return colors[i]; });
+
+          legend.append("text")
+            .attr("class", "mono")
+            .text(function(d) { return " ≥ " + Math.round(d); })
+            .attr("x", function(d, i) { return legendElementWidth * i; })
+            .attr("y", height + gridSize);
+      });
+    </script>
+
+        <!-- Javascript -->
+        <script src="{{ url_for('static',filename='js/jquery-1.11.1.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/jquery.backstretch.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/retina-1.1.0.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/tipsy.js') }}"></script>        
+        <!--[if lt IE 10]>
+            <script src="{{ url_for('static',filename='js/placeholder.js') }}"></script>
+        <![endif]-->
+
+  </body>
+<footer>
+</footer>
+</html>

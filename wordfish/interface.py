@@ -144,6 +144,14 @@ def clean_up(dirpath):
         shutil.rmtree(dirpath)
 
 
+# Visualization functions
+@app.route('/sims')
+def sims():
+    # For now, assume files are in running directory
+    cwd = os.getcwd()
+    input_files = glob("%s/*.tsv" %(cwd))
+    return render_template('word2vec.html',tsv_matrices=input_files)
+
 # This is how the command line version will run
 def main():
     print "Let's Fish!"

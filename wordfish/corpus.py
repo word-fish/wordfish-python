@@ -7,7 +7,9 @@ for parsing.
 
 '''
 
+from wordfish.utils import find_directories
 from textblob import TextBlob
+from glob import glob
 
 def save_sentences(articles,output_dir="."):
     '''save_sentences: 
@@ -56,3 +58,15 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
         filey.write(sentence.replace("}","").replace("{","").encode("utf-8"))
     filey.write('</text>"\n')
     filey.close()
+
+
+def get_corpus(analysis_dir):
+    corpus_folders = find_directories("%s/corpus" %(analysis_dir))
+    corpus = dict()
+    for folder in corpus_folders:
+        corpus_name = os.path.basename(folder)
+        sentences = glob("%s/sentences*" %(folder))
+        if len(sentences)>0:
+            corpus[corpus_name] = sentences
+    return corpus
+

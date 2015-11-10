@@ -14,6 +14,7 @@ import shutil
 import os
 import re
 import __init__
+import pickle
 
 def save_pretty_json(dict_obj,output_file):
     with open(output_file, 'w') as outfile:
@@ -22,6 +23,13 @@ def save_pretty_json(dict_obj,output_file):
 def get_installdir():
     return os.path.dirname(os.path.abspath(__init__.__file__))
 
+def save_pkl(save_obj,pickle_file):
+    pickle.dump(save_obj,open(pickle_file,"wb"))
+
+def mkdir(dirname):
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+    return os.path.abspath(dirname)
 
 def find_subdirectories(basepath):
     '''find_subdirectories
