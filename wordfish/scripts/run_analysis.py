@@ -19,7 +19,7 @@ For now, the method is as follows:
 '''
 
 # First train simple word2vec model with different corpus
-from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv
+from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models
 from wordfish.corpus import get_corpus
 from wordfish.terms import get_terms
 from wordfish.utils import mkdir
@@ -49,9 +49,21 @@ models["all"] = train_word2vec_model(combined_sentences)
 save_models(models,base_dir)
 export_models_tsv(models,base_dir)
 
-# TESTING TESTING TESTING
+# TESTING TESTING TESTING TESTING TESTING
 
 # Get all terms
-terms = merge_terms(analysis_dir)
+#models = load_models(analysis_dir)
+model = models["neurosynth"]
+terms = merge_terms(analysis_dir,subset=True)
+intersects = vocab_term_intersect(terms,model)
 
+# For each set of terms, find overlap with neurosynth model
+for tag,ints in intersects.iteritems():
+    vs = numpy.unique([x[3] for x in ints]).tolist()
+    export_models_tsv({"neurosynth_%s" %(tag):model},base_dir,vocabs=[vs])
 
+# Now combine all terms
+terms = merge_terms(analysis_dir,subset=False)
+intersects = vocab_term_intersect(terms,model)
+vs = numpy.unique([x[3] for x in intersects["all"]]).tolist()
+export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])

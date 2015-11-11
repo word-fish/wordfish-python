@@ -121,23 +121,41 @@ def save_terms(input_terms,output_dir=None):
     return result
 
 
-def merge_terms(analysis_dir):
+def merge_terms(analysis_dir,subset=False):
     '''
     For all terms defined, and relationships for the terms, parse into a single data structure
-    This won't work for larger datasets (we will use a database) but it will for testing.
+    This (maybe) won't work for larger datasets (we will use a database) but it will for testing.
 
         nodes:
 
-            {"[plugin]::[uid]"}
+            {"[plugin]::[uid]":[node]}
+
+    Parameters
+    ==========
+    analysis_dir: path
+        full path to analysis directory
+    subset: boolean
+        if True, returns terms in dictionary based on source tag. Default==False    
     '''
+
     nodes = dict()
     edges = dict()
 
     terms_dir = "%s/terms" %(os.path.abspath(analysis_dir))
     if os.path.exists(terms_dir):
         term_plugins = find_directories(terms_dir)
+
+
+        nodes = dict()
+        edges = dict()
+        results = dict()
+
         for term_plugin in term_plugins:
             plugin_name = os.path.basename(term_plugin)
+
+            if subset:
+                nodes = dict()
+                edges = dict()
 
             # Here we parse together terms
             if os.path.exists("%s/terms.json" %term_plugin):
@@ -163,7 +181,13 @@ def merge_terms(analysis_dir):
                                            "value": relation["value"]}
 
             result = {"nodes":nodes,"edges":edges}
+            if subset:
+                results[plugin_name] = result
     
+    if subset:
+        result = results
+    else:
+        result = {"all":result}
     # Return the result to user with all edges and nodes defined
     if analysis_dir is not None:
         tmp = save_pretty_json(result,"%s/terms/terms.json" %(analysis_dir))
