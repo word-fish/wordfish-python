@@ -50,11 +50,11 @@ def load_models(analysis_dir,model_keys=None):
 def extract_similarity_matrix(model,vocab=None):
     if vocab==None:
         vocab = model.vocab.keys()
-    nvocab = len(vocab)
+    nvocab = len(model.vocab.keys())
     simmat = pandas.DataFrame(columns=vocab)
-    for v in range(nvocab):
+    for v in range(len(vocab)):
         term = vocab[v]
-        print "parsing %s of %s: %s" %(v,nvocab,term)
+        print "parsing %s of %s: %s" %(v,len(vocab),term)
         sims = model.most_similar(term,topn=nvocab)
         values = [sims[x][1] for x in range(len(sims)) if sims[x][0] in vocab]
         labels = [sims[x][0] for x in range(len(sims)) if sims[x][0] in vocab]
