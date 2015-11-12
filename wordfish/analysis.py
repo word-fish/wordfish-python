@@ -6,6 +6,7 @@ part of the wordfish python package: extracting relationships of terms from corp
 '''
 
 from wordfish.nlp import text2sentences, sentence2words, find_phrases
+from glob import glob
 import gensim
 import pandas
 
@@ -41,7 +42,7 @@ def load_models(analysis_dir,model_keys=None):
         model_keys = glob("%s/*.word2vec" %(model_dir))
         model_keys = [os.path.basename(x).replace(".word2vec","") for x in model_keys]
     for model_key in model_keys:
-        model_file = "%s/%s.word2vec" %(analysis_dir,model_key)
+        model_file = "%s/%s.word2vec" %(model_dir,model_key)
         if os.path.exists(model_file):
             models[model_key] = gensim.models.Word2Vec.load(model_file)
     return models

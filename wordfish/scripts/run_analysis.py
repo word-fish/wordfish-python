@@ -49,7 +49,7 @@ models["all"] = train_word2vec_model(combined_sentences)
 save_models(models,base_dir)
 export_models_tsv(models,base_dir)
 
-# TESTING TESTING TESTING TESTING TESTING
+# NEUROSYNTH #############################################################
 
 # Get all terms
 #models = load_models(analysis_dir)
@@ -68,8 +68,36 @@ intersects = vocab_term_intersect(terms,model)
 vs = numpy.unique([x[3] for x in intersects["all"]]).tolist()
 export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
 
-#TODO:
-# make method to visualize matrices
-# redo installation, re-run scripts to produce all data
-# THEN give a go at using labels to do classification
-# when have vision for how to do ideal analysis, write up, do it.
+# EXPERIMENT 1:
+# Do cognitive atlas term relationships hold up in text?
+# If our ontology has value, it should be the case that terms (for which we defined relationships) are more similar than other terms for which no relationship is defined.
+
+# Load cognitive atlas terms
+
+# Find parent/child relationships
+model.most_similar(positive=['woman', 'king'], negative=['man'], topn=1)
+[('queen', 0.5359965)]
+ 
+ 
+# "boy" is to "father" as "girl" is to ...?
+model.most_similar(['girl', 'father'], ['boy'], topn=3)
+[('mother', 0.61849487), ('wife', 0.57972813), ('daughter', 0.56296098)]
+
+more_examples = ["he his she", "big bigger bad", "going went being"]
+for example in more_examples:
+    a, b, x = example.split()
+    predicted = model.most_similar([x, b], [a])[0][0]
+    print "'%s' is to '%s' as '%s' is to '%s'" % (a, b, x, predicted)
+#'he' is to 'his' as 'she' is to 'her'
+#'big' is to 'bigger' as 'bad' is to 'worse'
+#'going' is to 'went' as 'being' is to 'was'
+ 
+# which word doesn't go with the others?
+model.doesnt_match("breakfast cereal dinner lunch".split())
+'cereal'
+
+
+# EXPERIMENT 2:
+# Combined concepts
+# If cognitive atlas labeling is good, then a term with two parent concepts should be more similar to the mean of the child concepts than other concepts.
+# What would the ontology relationships look like if we derived them from text alone?
