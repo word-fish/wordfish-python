@@ -69,8 +69,6 @@ vs = numpy.unique([x[3] for x in intersects["all"]]).tolist()
 export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
 
 #TODO:
-# add method to give plugins ability to define labels (neurosynth)
-# This should be a matrix of term_uid (rows) by labels (cols) - binary to start [0,1]
 # make method to visualize matrices
 # redo installation, re-run scripts to produce all data
 # THEN give a go at using labels to do classification

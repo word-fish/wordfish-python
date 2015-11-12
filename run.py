@@ -8,6 +8,9 @@ from wordfish.utils import make_directory
 from wordfish.terms import download_nltk
 
 # DIRECTORIES #####################################################################
+if len(sys.argv) < 2:
+    print 'Please provide a base project folder path as the only input argument.'
+    sys.exit(32)
 analysis_dir = os.path.abspath(sys.argv[1])
 # /work/02092/vsochat/wrangler/
 #corenlp_dir="/%s/SOFTWARE/stanford-corenlp-full-2015-04-20" %(analysis_dir)

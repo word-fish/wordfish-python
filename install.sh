@@ -9,6 +9,12 @@
 # installation steps will not be necessary. User instructions will
 # be provided in documentation to give details to this.
 
+if [ $# -eq 0 ]
+  then
+    echo "Please provide a base project folder as the only input argument."
+    exit
+fi
+
 WORK=$1
 
 # Installation python package
