@@ -7,7 +7,7 @@ for parsing.
 
 '''
 
-from wordfish.utils import find_directories
+from wordfish.utils import find_directories, save_pretty_json
 from textblob import TextBlob
 from glob import glob
 
@@ -25,8 +25,11 @@ def save_sentences(articles,output_dir="."):
         eg $WORK/corpus/neurosynth
     '''
     if isinstance(articles,dict):
-        for uid, text in articles.iteritems():
-            save_sentences_single(uid,text,output_dir)
+        for uid, meta in articles.iteritems():
+            save_sentences_single(uid,meta["text"],output_dir)
+            # If more than one entry is provided, we also have meta data
+            if len(meta)>1:
+                save_labels(uid,meta,output_dir)
 
     elif isinstance(articles,list):
         for uid in range(len(articles)):
@@ -58,6 +61,23 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
         filey.write(sentence.replace("}","").replace("{","").encode("utf-8"))
     filey.write('</text>"\n')
     filey.close()
+
+
+def save_meta(uid,meta,output_dir):
+    '''save_labels
+ 
+    Parameters
+    ==========
+    uid: int or string
+        a unique ID for the article
+    meta: dict
+        dictionary with meta info, and labels
+    output_dir: path
+        full path to a plugins corpus directory
+    '''
+    output_file = "%s/meta.txt" %(output_dir)
+    tmp = save_pretty_json(meta,output_file)
+    return tmp
 
 
 def get_corpus(analysis_dir):
