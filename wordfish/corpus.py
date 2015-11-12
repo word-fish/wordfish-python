@@ -29,7 +29,7 @@ def save_sentences(articles,output_dir="."):
             save_sentences_single(uid,meta["text"],output_dir)
             # If more than one entry is provided, we also have meta data
             if len(meta)>1:
-                save_labels(uid,meta,output_dir)
+                save_meta(uid,meta,output_dir)
 
     elif isinstance(articles,list):
         for uid in range(len(articles)):
@@ -64,7 +64,7 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
 
 
 def save_meta(uid,meta,output_dir):
-    '''save_labels
+    '''save_meta
  
     Parameters
     ==========
