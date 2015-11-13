@@ -21,9 +21,10 @@ For now, the method is as follows:
 # First train simple word2vec model with different corpus
 from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models
 from wordfish.corpus import get_corpus
-from wordfish.terms import get_terms
+from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
 import sys
+import pandas
 
 base_dir = sys.argv[1]
 
@@ -73,9 +74,49 @@ export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
 # If our ontology has value, it should be the case that terms (for which we defined relationships) are more similar than other terms for which no relationship is defined.
 
 # Load cognitive atlas terms
+intersect_subset = intersects["cognitiveatlas"]
+cogat_terms = [x[2] for x in intersect_subset]
+neurosynth_terms = [x[3] for x in intersect_subset]
+df = pandas.DataFrame()
+df["cognitiveatlas"] = cogat_terms
+df["neurosynth"] = neurosynth_terms
+df=df.drop_duplicates()
+df.to_csv("%s/terms/cognitiveatlas/intersect.tsv" %(analysis_dir), sep="\t")
+
 
 # Find parent/child relationships
-model.most_similar(positive=['woman', 'king'], negative=['man'], topn=1)
+relationships = terms["cognitiveatlas"]["edges"]
+nodes = terms["cognitiveatlas"]["nodes"]
+uids = [x.split("::")[1] for x in nodes.keys()]
+
+# Save the actual relationships, and predicted
+predictions = []
+for c in range(len(cogat_terms)):
+    cogat_term = cogat_terms[c]
+    nsyn_term = neurosynth_terms[c]
+    concept = get_concept(name=cogat_term).json[0]
+    if "relationships" in concept:
+        actual_relationships = [x["id"] for x in concept["relationships"]]
+        directions = ["%s,%s" %(x["direction"],x["relationship"]) for x in concept["relationships"]]
+        actual_relationships = [nodes["cognitiveatlas::%s" %x]["name"] for x in actual_relationships]
+        predicted_relationships = model.most_similar(nsyn_term, topn=len(actual_relationships))
+        predictions.append((cogat_term,nsyn_term,actual_relationships,directions,predicted_relationships))
+
+
+# We will look up the cogat_name, and then match to nsynth
+cogat_names = [x["name"] for x in nodes.values() if x in df.cognitiveatlas]
+nsyn_names [df.neurosynth[df.cognitiveatlas==x] for x in cogat_names]
+
+# It will be faster to use cognitiveatlas api directly without a database
+from cognitiveatlas import get_concept
+# Save the actual relationships, and predicted
+actual = dict()
+predicted = dict()
+for uid in uids:
+    concept = get_concept(id=uid).json[0]
+    if "relationships" in concept:
+        actual_relationships = [x["id"] for x in concept["relationships"]]
+        predicted_relationships = model.most_similar(nodes[], topn=len(actual_relationships))
 [('queen', 0.5359965)]
  
  

@@ -11,7 +11,7 @@ from wordfish.utils import find_directories, save_pretty_json
 from textblob import TextBlob
 from glob import glob
 
-def save_sentences(articles,output_dir="."):
+def save_sentences(articles,output_dir=".",prefix=""):
     '''save_sentences: 
     parses a dictionary with articles and sentences into output sentence files
     Parameters
@@ -26,16 +26,16 @@ def save_sentences(articles,output_dir="."):
     '''
     if isinstance(articles,dict):
         for uid, meta in articles.iteritems():
-            save_sentences_single(uid,meta["text"],output_dir)
+            save_sentences_single(uid,meta["text"],output_dir,prefix)
             # If more than one entry is provided, we also have meta data
             if len(meta)>1:
                 save_meta(uid,meta,output_dir)
 
     elif isinstance(articles,list):
         for uid in range(len(articles)):
-            save_sentences_single(uid,articles[uid],output_dir)
+            save_sentences_single(uid,articles[uid],output_dir,prefix)
 
-def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
+def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True,prefix=""):
     '''save_sentence_single
     Write sentences to file
 
@@ -52,7 +52,9 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
     output_dir: path
         full path to a plugins corpus directory
     '''
-    output_file = "%s/sentences.txt" %(output_dir)
+    if prefix != "":
+        prefix = "%s_" %(prefix)
+    output_file = "%s/%ssentences.txt" %(output_dir,prefix)
     filey = open(output_file,"ab")
     filey.write('%s|"<text>' %uid)
     blob = TextBlob(text)
@@ -63,7 +65,7 @@ def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True):
     filey.close()
 
 
-def save_meta(uid,meta,output_dir):
+def save_meta(uid,meta,output_dir,prefix=""):
     '''save_meta
  
     Parameters
@@ -75,7 +77,9 @@ def save_meta(uid,meta,output_dir):
     output_dir: path
         full path to a plugins corpus directory
     '''
-    output_file = "%s/meta.txt" %(output_dir)
+    if prefix != "":
+        prefix = "%s_" %(prefix)
+    output_file = "%s/%smeta.txt" %(output_dir,prefix)
     tmp = save_pretty_json(meta,output_file)
     return tmp
 

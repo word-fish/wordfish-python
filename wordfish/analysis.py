@@ -105,6 +105,8 @@ def vocab_term_intersect(terms,model):
        [value]--> tuples in form
        (term_index,vocab_index,term,vocab)
 
+    repeat: the number of times to go over the text (appropriate for
+    longer text with possible repetition of terms)
     '''
     vocab = model.vocab.keys()
     intersects = dict()

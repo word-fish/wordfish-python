@@ -207,7 +207,7 @@ def get_match(phrasematch,entirephrase,found_indices):
               "found_indices":found_indices}
     return result
 
-def find_phrases(words,vocabulary,repeat=2):
+def find_phrases(words,vocabulary,repeat=1):
     '''
     words: a list of words
     vocabulary: a list of words / phrases to find in the words

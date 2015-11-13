@@ -192,14 +192,3 @@ def merge_terms(analysis_dir,subset=False):
     if analysis_dir is not None:
         tmp = save_pretty_json(result,"%s/terms/terms.json" %(analysis_dir))
     return result
-
-
-def get_terms(analysis_dir):
-    terms_folders = find_directories("%s/terms" %(analysis_dir))
-    terms = dict()
-    for folder in corpus_folders:
-        terms_name = os.path.basename(folder)
-        output = glob("%s/terms*" %(folder))
-        if len(sentences)>0:
-            terms[terms_name] = output
-    return corpus
