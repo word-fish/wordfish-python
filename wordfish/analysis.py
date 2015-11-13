@@ -32,12 +32,12 @@ def save_models(models,base_dir):
     save_models: should be a dictionary with tags as keys, models as value
     '''
     for model_key,model in models.iteritems():
-        model.save("%s/analysis/models/%s.word2vec" %(model_dir,model_key))
+        model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
-def load_models(analysis_dir,model_keys=None):
+def load_models(base_dir,model_keys=None):
     if isinstance(model_keys,str): model_keys = [model_keys]
     models = dict()
-    model_dir = "%s/analysis/models" %(analysis_dir)
+    model_dir = "%s/analysis/models" %(base_dir)
     if model_keys == None:
         model_keys = glob("%s/*.word2vec" %(model_dir))
         model_keys = [os.path.basename(x).replace(".word2vec","") for x in model_keys]
@@ -91,7 +91,7 @@ def export_model_tsv(model,tag,base_dir,vocab=None):
     tag: tag corresponding to model name (corpus)
     '''
     df = extract_similarity_matrix(model,vocab=vocab)
-    df.to_csv("%s/analysis/models/%s.tsv" %(analysis_dir,tag),sep="\t")
+    df.to_csv("%s/analysis/models/%s.tsv" %(base_dir,tag),sep="\t")
     return df
 
 

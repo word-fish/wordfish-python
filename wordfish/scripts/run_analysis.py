@@ -16,10 +16,13 @@ For now, the method is as follows:
      Need to think about how to do this for one at a time... here is where we may need
      to write to database :)
 
+     IMPORTANT: For now, this is all testing. I don't want to implement any definite functions
+     until I have a sense of the functionality that I want.
+
 '''
 
 # First train simple word2vec model with different corpus
-from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models
+from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix
 from wordfish.corpus import get_corpus
 from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
@@ -32,15 +35,37 @@ base_dir = sys.argv[1]
 analysis_dir = mkdir("%s/analysis" %(base_dir))
 model_dir = mkdir("%s/models" %(analysis_dir))
 
-corpus = get_corpus(analysis_dir)
+corpus = get_corpus(base_dir)
+
+# Break up reddit corpus by disorder
+reddit = corpus["reddit"][0]
+reddit = open(reddit,"rb").readlines()
+disorders = dict()
+for red in reddit:
+    uid,text = red.split("|")
+    topic = uid.split("_")[0]
+    if topic in disorders:
+        holder = disorders[topic]
+        holder.append(text)
+        disorders[topic] = holder
+    else:
+        disorders[topic] = [text]
+
+for disorder,text in disorders.iteritems():
+    outfile = open("%s/corpus/reddit/%s_sentences.txt" %(base_dir,disorder),"wb")
+    outfile.writelines(text)
+    outfile.close()
+
+corpus = get_corpus(base_dir)
 
 # Train corpus specific models
 models = dict()
-combined_sentences = []
 for corpus_id,sentences in corpus.iteritems():
-    print "Training model for corpus %s" %(corpus_id)
-    models[corpus_id] = train_word2vec_model(sentences)
-    combined_sentences = sentences + combined_sentences
+    for sentence in sentences:
+        topic = os.path.basename(sentence).replace("_sentences.txt","")
+        if topic not in models and topic != "sentences.txt":
+            print "Training model for corpus %s" %(topic)
+            models[topic] = train_word2vec_model([sentence])
 
 # Train model for all corpus
 print "Training model for all corpus combined"
@@ -50,24 +75,57 @@ models["all"] = train_word2vec_model(combined_sentences)
 save_models(models,base_dir)
 export_models_tsv(models,base_dir)
 
+# For each set of terms, find overlap with neurosynth model
+for model_name,model in models.iteritems():
+    intersects = vocab_term_intersect(terms,model)
+    for tag,ints in intersects.iteritems():
+        vs = numpy.unique([x[3] for x in ints]).tolist()
+        export_models_tsv({"reddit_%s_%s" %(tag,model_name):model},base_dir,vocabs=[vs])
+
+
+# CLASSIFICATION OF DISORDER with reddit text ############################
+
+
+
 # NEUROSYNTH #############################################################
 
 # Get all terms
-#models = load_models(analysis_dir)
+#models = load_models(base_dir)
 model = models["neurosynth"]
-terms = merge_terms(analysis_dir,subset=True)
+terms = merge_terms(base_dir,subset=True)
 intersects = vocab_term_intersect(terms,model)
 
 # For each set of terms, find overlap with neurosynth model
 for tag,ints in intersects.iteritems():
     vs = numpy.unique([x[3] for x in ints]).tolist()
-    export_models_tsv({"neurosynth_%s" %(tag):model},base_dir,vocabs=[vs])
+    export_models_tsv({"reddit_%s" %(tag):model},base_dir,vocabs=[vs])
 
 # Now combine all terms
 terms = merge_terms(analysis_dir,subset=False)
 intersects = vocab_term_intersect(terms,model)
 vs = numpy.unique([x[3] for x in intersects["all"]]).tolist()
 export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
+
+# EXPERIMENT 0:
+# How does comparing neurosynth maps compare to our matrix?
+# We have term relationships defined based on word2vec neural network embeddings
+# Neurosynth relationships are defined by pearson comparison of unthresholded reverse inference
+# map for that term. How do these two matriccs compare?
+wordfish_sims = extract_similarity_matrix(models["neurosynth"])
+neurosynth_sims = pandas.DataFrame(columns=wordfish_sims.columns,index=wordfish_sims.columns)
+relations = terms["neurosynth"]["edges"]
+for relation in relations:
+    term1 = relation["source"].replace("neurosynth::","")
+    term1 = relation["source"].replace("neurosynth::","")
+    neurosynth_sims.loc[term1,term2] = float(relation["value"])
+
+wordfish_sims.to_csv("sims_wordfish_neurosynth.tsv",sep="\t")
+neurosynth_sims.to_csv("sims_neurosynth_neurosynth.tsv",sep="\t")
+
+# EXPERIMENT 1:
+# Can we train a model to predict disorder based on text from reddit?
+# Load meta data associated with corpus, this is where we have labels
+meta = pandas.read_csv("%s/corpus/reddit/meta.txt" %(base_dir),sep="\t")
 
 # EXPERIMENT 1:
 # Do cognitive atlas term relationships hold up in text?
@@ -82,7 +140,6 @@ df["cognitiveatlas"] = cogat_terms
 df["neurosynth"] = neurosynth_terms
 df=df.drop_duplicates()
 df.to_csv("%s/terms/cognitiveatlas/intersect.tsv" %(analysis_dir), sep="\t")
-
 
 # Find parent/child relationships
 relationships = terms["cognitiveatlas"]["edges"]
@@ -142,3 +199,7 @@ model.doesnt_match("breakfast cereal dinner lunch".split())
 # Combined concepts
 # If cognitive atlas labeling is good, then a term with two parent concepts should be more similar to the mean of the child concepts than other concepts.
 # What would the ontology relationships look like if we derived them from text alone?
+
+#TODO:
+# finish experiments above, including classification and comparison with neurosynth
+# make interface to visualize 1) word embeddings, 2) comparing a word across corpus

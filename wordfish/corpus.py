@@ -10,6 +10,7 @@ for parsing.
 from wordfish.utils import find_directories, save_pretty_json
 from textblob import TextBlob
 from glob import glob
+import os
 
 def save_sentences(articles,output_dir=".",prefix=""):
     '''save_sentences: 
@@ -79,7 +80,7 @@ def save_meta(uid,meta,output_dir,prefix=""):
     '''
     if prefix != "":
         prefix = "%s_" %(prefix)
-    output_file = "%s/%smeta.txt" %(output_dir,prefix)
+    output_file = "%s/%s_%smeta.txt" %(output_dir,uid,prefix)
     tmp = save_pretty_json(meta,output_file)
     return tmp
 
@@ -89,7 +90,7 @@ def get_corpus(analysis_dir):
     corpus = dict()
     for folder in corpus_folders:
         corpus_name = os.path.basename(folder)
-        sentences = glob("%s/sentences*" %(folder))
+        sentences = glob("%s/*sentences*" %(folder))
         if len(sentences)>0:
             corpus[corpus_name] = sentences
     return corpus
