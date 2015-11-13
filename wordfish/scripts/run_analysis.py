@@ -23,7 +23,7 @@ For now, the method is as follows:
 
 # First train simple word2vec model with different corpus
 from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix
-from wordfish.corpus import get_corpus
+from wordfish.corpus import get_corpus, get_meta
 from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
 import sys
@@ -114,13 +114,17 @@ export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
 wordfish_sims = extract_similarity_matrix(models["neurosynth"])
 neurosynth_sims = pandas.DataFrame(columns=wordfish_sims.columns,index=wordfish_sims.columns)
 relations = terms["neurosynth"]["edges"]
-for relation in relations:
+count=0
+for relid,relation in relations.iteritems():
+    print "%s of %s" %(count,len(relations))
     term1 = relation["source"].replace("neurosynth::","")
-    term1 = relation["source"].replace("neurosynth::","")
+    term2 = relation["target"].replace("neurosynth::","")
     neurosynth_sims.loc[term1,term2] = float(relation["value"])
+    neurosynth_sims.loc[term2,term1] = float(relation["value"])
+    count+=1
 
-wordfish_sims.to_csv("sims_wordfish_neurosynth.tsv",sep="\t")
-neurosynth_sims.to_csv("sims_neurosynth_neurosynth.tsv",sep="\t")
+wordfish_sims.to_csv("%s/sims_wordfish_neurosynth.tsv" %(analysis_dir),sep="\t")
+neurosynth_sims.to_csv("%s/sims_neurosynth_neurosynth.tsv" %(analysis_dir),sep="\t")
 
 # EXPERIMENT 1:
 # Can we train a model to predict disorder based on text from reddit?

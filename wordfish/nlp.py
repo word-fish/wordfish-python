@@ -15,12 +15,15 @@ import pandas
 import gensim
 import re
 
+def remove_nonenglish_chars(text):
+    return re.sub("[^a-zA-Z]", " ", text)
+    
 def text2sentences(text,remove_non_english_chars=True):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')    
     if remove_non_english_chars:
-        text = re.sub("[^a-zA-Z]", " ", text)
+        text = remove_nonenglish_chars(text)
     for s in tokenizer.tokenize(text):
-        yield s
+            yield s
 
 def sentence2words(sentence,remove_stop_words=True,lower=True):
     if isinstance(sentence,list): sentence = sentence[0]
