@@ -285,5 +285,5 @@ def format_single_input(varname,element):
     return " %s=%s," %(varname,element) 
 
 def format_inputs(varname,elements):
-    elements = ['"%s"' %(x) for x in elements if isinstance(x,str)] 
+    elements = ['"%s"' %(x) if isinstance(x,str) else x for x in elements]
     return " %s=[%s]" %(varname,",".join(elements)) 
