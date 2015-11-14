@@ -47,6 +47,16 @@ def load_models(base_dir,model_keys=None):
             models[model_key] = gensim.models.Word2Vec.load(model_file)
     return models
 
+
+def extract_vectors(model,vocab=None):
+    if vocab==None:
+        vocab = model.vocab.keys()
+    length = len(model.__getitem__(vocab[0]))
+    vectors = pandas.DataFrame(columns=range(length))
+    for v in vocab:
+        vectors.loc[v] = model.__getitem__(v)
+    return vectors
+
 # This is very slow - likely we can extract matrix from model itself
 def extract_similarity_matrix(model,vocab=None):
     if vocab==None:

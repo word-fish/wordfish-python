@@ -4,7 +4,7 @@ functions for working with virtual machines, repos
 
 '''
 from wordfish.utils import copy_directory, get_template, save_template, get_installdir, sub_template
-from wordfish.plugin import get_plugins, move_plugins, load_plugins, write_plugin_relationship_job, write_plugin_terms_job, write_plugin_corpus_job, load_plugin
+from wordfish.plugin import get_plugins, move_plugins, load_plugins, go_fish, load_plugin
 from git import Repo
 from glob import glob
 import numpy
@@ -50,16 +50,13 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
         # Copy valid plugins into app_repo
         move_plugins(valid_plugins,app_dest)
 
-        # Generate run commands for each of corpus,terms,relationships
-        setup_extraction(valid_plugins,app_dest,"relationships","relationships")
-        setup_extraction(valid_plugins,app_dest,"terms","terms")
-        setup_extraction(valid_plugins,app_dest,"corpus","corpus")
+        # Generate run commands
+        setup_extraction(valid_plugins,app_dest)
 
         #TODO: We will have a script here to run the analysis, after the above 3
 
     else:
         print "Folder exists at %s, cannot generate." %(battery_dest)
-
 
 
 def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
@@ -73,7 +70,7 @@ def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
         repo_types = [repo_types]
     for repo in repo_types:
         if repo in acceptable_types:
-            download_repo("https://www.github.com/vsoch/wordfish-%s" %(repo),"%s/%s" %(tmpdir,repo))
+            download_repo("https://www.github.com/word-fish/wordfish-%s" %(repo),"%s/%s" %(tmpdir,repo))
         else:
             print "%s is not an acceptable option for repo_types." %(repo)
     return tmpdir
@@ -155,7 +152,7 @@ def generate_requirements(valid_plugins,app_dest):
     save_template("%s/requirements.txt" %(app_dest),"\n".join(new_requirements))
 
 
-def setup_extraction(valid_plugins,app_dest,extraction_type,field_name,field_value="True"):
+def setup_extraction(valid_plugins,app_dest,field_name,field_value="True"):
     '''
     setup_extractions will generate a run time script
     directory in the application scripts folder, and then, for
@@ -167,21 +164,14 @@ def setup_extraction(valid_plugins,app_dest,extraction_type,field_name,field_val
     field_value: The value that must be specified to be included
 
     '''
-    if extraction_type in ["relationships","corpus","terms"]:
-        script_directory = "%s/wordfish/scripts" %app_dest
-        if not os.path.exists(script_directory):
-            os.mkdir(script_directory)
-        extraction_script = "%s/run_extraction_%s.job" %(script_directory,extraction_type)
-        for valid_plugin in valid_plugins:
-            plugin = load_plugin(valid_plugin)[0]
-            if plugin[field_name] == field_value:
-                # Redundant for now, but in preparation for different inputs
-                if extraction_type == "relationships":
-                    write_plugin_relationship_job(plugin["tag"],extraction_script)
-                elif extraction_type == "corpus":
-                    write_plugin_corpus_job(plugin["tag"],extraction_script)
-                elif extraction_type == "terms":
-                    write_plugin_terms_job(plugin["tag"],extraction_script)
+    script_directory = "%s/wordfish/scripts" %app_dest
+    if not os.path.exists(script_directory):
+        os.mkdir(script_directory)
+    extraction_script = "%s/run_first.job" %(script_directory)
+    for valid_plugin in valid_plugins:
+        plugin = load_plugin(valid_plugin)[0]
+        if plugin["corpus"] == True or plugin["terms"] == True:
+            go_fish(plugin["tag"],extraction_script)
 
 def init_scripts(scripts_dir,output_base):
     '''init_scripts:

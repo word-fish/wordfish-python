@@ -7,8 +7,9 @@ this set of functions finds and validates plugins for inclusion in the package
 TODO: These functions will be written when it is time to create the web app portion of this.
 
 '''
-from wordfish.utils import find_directories, remove_unicode_dict, copy_directory, add_lines
+from wordfish.utils import find_directories, remove_unicode_dict, copy_directory, add_lines, wordfish_home
 from glob import glob
+import inspect
 import json
 import os
 import nltk
@@ -199,14 +200,82 @@ def move_plugins(valid_plugins,app_dest):
 
 # EXTRACTION JOBS ############################################################
 
-def write_plugin_relationship_job(tag,extraction_script):
-    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_relationships; extract_relationships(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
+def go_fish(tag,extraction_script):
+    line_to_add = "python -c 'from wordfish.plugins.%s.functions import go_fish; go_fish()'" %(tag)
     add_lines(script=extraction_script,lines_to_add=[line_to_add])
 
-def write_plugin_corpus_job(tag,extraction_script):
-    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_text; extract_text(\"[SUB_OUTPUTBASE_SUB]/corpus/%s\")'" %(tag,tag)
-    add_lines(script=extraction_script,lines_to_add=[line_to_add])
+def generate_job(func,category,inputs=None,batch_num=1):
+    '''
+    generate_job
+    Parameters
+    ==========
+    func: str
+        name of function to call in plugin functions.py
+    category: str
+        must be one of "terms" or "corpus" corresponding to output folder
+    inputs: dict
+        key should be arg name, and value should be list of string args as input to func
+        If inputs are not specified, it is assumed that the function will be called once
+        with no inputs.
+    batch_num: int
+        the number of jobs to package into one job. For example, batch_num=100 will run
+        func with 100 of the input items specified. Each is still written to its own
+        output file.
+    '''
+    # Get name of calling plugin
+    home = wordfish_home()
+    cf = inspect.currentframe()    
+    caller = inspect.getouterframes(cf, 2)
+    tag = os.path.dirname(caller[1][1]).split("/")[-1]
+    script = "wordfish.plugins.%s.functions" %(tag)
+    output_dir = ' output_dir="%s/%s/%s"' %(home,category,tag) 
+    lines_to_add = []      
+    if category in ["corpus","terms"]:
+        if inputs == None:
+            lines_to_add.append("python -c 'from %s import %s; %s(%s)'" %(script,func,func,output_dir))
+        else:
+            formatted_inputs = ""
+            # First collect all string args - this means same for all scripts
+            for varname,elements in inputs.iteritems():
+                if isinstance(elements,str):
+                    elements = [elements]
+                    single_input = format_single_input(varname,elements)
+                    formatted_inputs = "%s%s" %(formatted_inputs,single_input)
+                          
+            # Now collect lists, must be equal length
+            input_lists = dict()
+            for varname,elements in inputs.iteritems():
+                if isinstance(elements,list):
+                    if len(input_lists)>0:
+                        if len(input_lists.values()[0]) == len(elements):    
+                            input_lists[varname] = elements
+                    else:
+                        input_lists[varname] = elements
 
-def write_plugin_terms_job(tag,extraction_script):
-    line_to_add = "python -c 'from wordfish.plugins.%s.functions import extract_terms; extract_terms(\"[SUB_OUTPUTBASE_SUB]/terms/%s\")'" %(tag,tag)
-    add_lines(script=extraction_script,lines_to_add=[line_to_add])
+            # If we have no input lists, just write the job with single args
+            if len(input_lists) == 0:
+                formatted_inputs = formatted_inputs.strip(",")
+                lines_to_add.append("python -c 'from %s import %s; %s(%s,%s)'" %(script,func,func,output_dir,formatted_inputs))
+            else:
+                N = len(input_lists.values()[0])
+                iters = numpy.ceil(N/float(batch_num))
+                start = 0
+                for i in iters:
+                    formatted_instance = formatted_inputs
+                    if i==batch_num:
+                        end = N
+                    else:
+                        end = i*batch_num
+                    for varname,elements in input_lists.iteritems():
+                        new_input = format_inputs(varname,elements[start:end])
+                        formatted_instance = "%s%s" %(formatted_instance,new_input)
+                    start = end
+                    formatted_instance.strip(",")
+                    lines_to_add.append("python -c 'from %s import %s; %s(%s)'" %(script,func,func,output_dir,formatted_instance))
+
+
+def format_single_input(varname,element):
+    return " %s=%s," %(varname,element) 
+
+def format_inputs(varname,elements):
+    return " %s=" %(varname,"[%s]" %(",".join(elements))) 

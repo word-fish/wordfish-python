@@ -16,6 +16,9 @@ import re
 import __init__
 import pickle
 
+def wordfish_home():
+    return os.environ["WORDFISH_HOME"]
+
 def save_pretty_json(dict_obj,output_file):
     with open(output_file, 'w') as outfile:
         json.dump(dict_obj,outfile)

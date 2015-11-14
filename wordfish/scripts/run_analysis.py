@@ -22,7 +22,7 @@ For now, the method is as follows:
 '''
 
 # First train simple word2vec model with different corpus
-from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix
+from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix, extract_vectors
 from wordfish.corpus import get_corpus, get_meta
 from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
@@ -34,6 +34,7 @@ base_dir = sys.argv[1]
 # Setup analysis output directory
 analysis_dir = mkdir("%s/analysis" %(base_dir))
 model_dir = mkdir("%s/models" %(analysis_dir))
+vector_dir = mkdir("%s/vectors" %(analysis_dir))
 
 corpus = get_corpus(base_dir)
 
@@ -82,6 +83,10 @@ for model_name,model in models.iteritems():
         vs = numpy.unique([x[3] for x in ints]).tolist()
         export_models_tsv({"reddit_%s_%s" %(tag,model_name):model},base_dir,vocabs=[vs])
 
+for model_name,model in models.iteritems():
+    print "Processing %s" %(model_name)
+    vecs = extract_vectors(model)
+    vecs.to_csv("%s/%s.tsv" %(vector_dir,model_name),sep="\t")
 
 # CLASSIFICATION OF DISORDER with reddit text ############################
 
@@ -101,7 +106,7 @@ for tag,ints in intersects.iteritems():
     export_models_tsv({"reddit_%s" %(tag):model},base_dir,vocabs=[vs])
 
 # Now combine all terms
-terms = merge_terms(analysis_dir,subset=False)
+terms = merge_terms(base_dir,subset=False)
 intersects = vocab_term_intersect(terms,model)
 vs = numpy.unique([x[3] for x in intersects["all"]]).tolist()
 export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
@@ -111,6 +116,18 @@ export_models_tsv({"neurosynth_all":model},base_dir,vocabs=[vs])
 # We have term relationships defined based on word2vec neural network embeddings
 # Neurosynth relationships are defined by pearson comparison of unthresholded reverse inference
 # map for that term. How do these two matriccs compare?
+
+# First get all neurosynth terms
+relations = terms["neurosynth"]["edges"]
+nterms []
+for relid,relation in relations.iteritems():
+    term1 = relation["source"].replace("neurosynth::","")
+    term2 = relation["target"].replace("neurosynth::","")
+    if term1 not in nterms:
+        nterms.append(term1)
+    if term2 not in nterms:
+        nterms.append(term2)
+
 wordfish_sims = extract_similarity_matrix(models["neurosynth"])
 neurosynth_sims = pandas.DataFrame(columns=wordfish_sims.columns,index=wordfish_sims.columns)
 relations = terms["neurosynth"]["edges"]
@@ -129,7 +146,8 @@ neurosynth_sims.to_csv("%s/sims_neurosynth_neurosynth.tsv" %(analysis_dir),sep="
 # EXPERIMENT 1:
 # Can we train a model to predict disorder based on text from reddit?
 # Load meta data associated with corpus, this is where we have labels
-meta = pandas.read_csv("%s/corpus/reddit/meta.txt" %(base_dir),sep="\t")
+
+
 
 # EXPERIMENT 1:
 # Do cognitive atlas term relationships hold up in text?
