@@ -13,6 +13,12 @@ script_dir = os.path.dirname(os.path.realpath(__file__))
 job_dir = "%s/.job" %(script_dir)
 out_dir = "%s/.out" %(script_dir)
 
+### MODIFY SUBMISSION ARGS HERE ###########################################
+queue_name = "normal"
+time = "2-00:00"
+memory = 12000
+##############
+
 
 if len(sys.argv) < 2:
     print 'Please provide job file with list of single commands as input.'
@@ -40,8 +46,8 @@ else:
         jobfile.writelines("#SBATCH --job-name=%s_%s.job\n" %(name,c))
         jobfile.writelines("#SBATCH --output=%s/%s_%s.out\n" %(out_dir,name,c))
         jobfile.writelines("#SBATCH --error=%s/%s_%s.err\n" %(out_dir,name,c)) 
-        jobfile.writelines("#SBATCH --time=2-00:00\n") 
-        jobfile.writelines("#SBATCH --mem=12000\n")   
+        jobfile.writelines("#SBATCH --time=%s\n" %(time)) 
+        jobfile.writelines("#SBATCH --mem=%s\n" %(memory))   
         jobfile.writelines(command)  
         jobfile.close()
         os.system('sbatch -p normal -n 1 %s/%s_%s.job' %(job_dir,name,c))

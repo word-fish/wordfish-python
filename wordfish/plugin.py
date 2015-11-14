@@ -229,6 +229,10 @@ def generate_job(func,category,inputs=None,batch_num=1):
     tag = os.path.dirname(caller[1][1]).split("/")[-1]
     script = "wordfish.plugins.%s.functions" %(tag)
     output_dir = ' output_dir="%s/%s/%s"' %(home,category,tag) 
+
+    # script name to add jobs to
+    extraction_script = "%s/scripts/run_extractions_%s.job" %(home,tag)
+
     lines_to_add = []      
     if category in ["corpus","terms"]:
         if inputs == None:
@@ -258,11 +262,11 @@ def generate_job(func,category,inputs=None,batch_num=1):
                 lines_to_add.append("python -c 'from %s import %s; %s(%s,%s)'" %(script,func,func,output_dir,formatted_inputs))
             else:
                 N = len(input_lists.values()[0])
-                iters = numpy.ceil(N/float(batch_num))
+                iters = int(numpy.ceil(N/float(batch_num)))
                 start = 0
-                for i in iters:
+                for i in range(1,iters+1):
                     formatted_instance = formatted_inputs
-                    if i==batch_num:
+                    if i==N:
                         end = N
                     else:
                         end = i*batch_num
@@ -271,11 +275,15 @@ def generate_job(func,category,inputs=None,batch_num=1):
                         formatted_instance = "%s%s" %(formatted_instance,new_input)
                     start = end
                     formatted_instance.strip(",")
-                    lines_to_add.append("python -c 'from %s import %s; %s(%s)'" %(script,func,func,output_dir,formatted_instance))
+                    lines_to_add.append("python -c 'from %s import %s; %s(%s,%s)'" %(script,func,func,output_dir,formatted_instance))
 
+        # Add lines
+        add_lines(script=extraction_script,lines_to_add=lines_to_add)
+    
 
 def format_single_input(varname,element):
     return " %s=%s," %(varname,element) 
 
 def format_inputs(varname,elements):
-    return " %s=" %(varname,"[%s]" %(",".join(elements))) 
+    elements = ['"%s"' %(x) for x in elements if isinstance(x,str)] 
+    return " %s=[%s]" %(varname,",".join(elements)) 

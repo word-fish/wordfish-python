@@ -18,11 +18,12 @@ fi
 WORK=$1
 
 # Add WORDFISH_HOME to bash rc
-echo "export WORDFISH_HOME=$WORK" >> .bashrc
-echo "export WORDFISH_HOME=$WORK" >> .env
+echo "export WORDFISH_HOME=$WORK" >> ~/.bashrc
+echo "export WORDFISH_HOME=$WORK" >> ~/.env
 
 # Installation python package
 python setup.py install --user
+source ~/.bashrc
 
 # Run the script to call the application
 python run.py $WORK

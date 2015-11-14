@@ -44,7 +44,7 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
             subset_plugins = [x for x in valid_plugins if os.path.basename(x) in plugins]
             valid_plugins = subset_plugins  
 
-        # Generate the setup.py from template to include all python dependencies for plugins
+        # Generate the requirements.txt from template to include all python dependencies for plugins
         generate_requirements(valid_plugins,app_dest)
 
         # Copy valid plugins into app_repo
@@ -52,8 +52,6 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
 
         # Generate run commands
         setup_extraction(valid_plugins,app_dest)
-
-        #TODO: We will have a script here to run the analysis, after the above 3
 
     else:
         print "Folder exists at %s, cannot generate." %(battery_dest)
@@ -160,9 +158,6 @@ def setup_extraction(valid_plugins,app_dest):
     write a line to a job script (that can be run with launch or slurm)
     to call the function.
 
-    field_name: The field name to be checked for a value
-    field_value: The value that must be specified to be included
-
     '''
     script_directory = "%s/wordfish/scripts" %app_dest
     if not os.path.exists(script_directory):
@@ -170,7 +165,7 @@ def setup_extraction(valid_plugins,app_dest):
     extraction_script = "%s/run_first.job" %(script_directory)
     for valid_plugin in valid_plugins:
         plugin = load_plugin(valid_plugin)[0]
-        if plugin["corpus"] == True or plugin["terms"] == True:
+        if plugin["corpus"] == "True" or plugin["terms"] == "True":
             go_fish(plugin["tag"],extraction_script)
 
 def init_scripts(scripts_dir,output_base):

@@ -116,17 +116,6 @@ def select():
                                   plugin_repo="%s/plugins"%tmpdir,
                                   plugins=selected_plugins)
 
-            # Find plugins with relationships == True
-            # A command is written to launch script for each
-            
-
-            # TODO: 
-            # For each plugin, need to write import statements,
-            # extraction line 
-     
-            # Copy run.py template into home from templates (or should
-            # it already be there?)
-
         # Option 2 or 3: Virtual machine (vagrant) or cloud (aws)
         #else: #TODO:WRITEME
             #specify_experiments(battery_dest=tmpdir,experiments=selected_experiments)
