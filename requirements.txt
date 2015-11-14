@@ -1,5 +1,7 @@
 numpy
 nltk
+gitdb
+smmap
 flask
 gitpython
 gensim
