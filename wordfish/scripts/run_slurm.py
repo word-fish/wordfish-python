@@ -16,7 +16,7 @@ out_dir = "%s/.out" %(script_dir)
 ### MODIFY SUBMISSION ARGS HERE ###########################################
 queue_name = "normal"
 time = "2-00:00"
-memory = 12000
+memory = 64000
 ##############
 
 
