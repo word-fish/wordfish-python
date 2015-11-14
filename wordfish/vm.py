@@ -152,7 +152,7 @@ def generate_requirements(valid_plugins,app_dest):
     save_template("%s/requirements.txt" %(app_dest),"\n".join(new_requirements))
 
 
-def setup_extraction(valid_plugins,app_dest,field_name,field_value="True"):
+def setup_extraction(valid_plugins,app_dest):
     '''
     setup_extractions will generate a run time script
     directory in the application scripts folder, and then, for
