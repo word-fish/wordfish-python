@@ -50,4 +50,4 @@ else:
         jobfile.writelines("#SBATCH --mem=%s\n" %(memory))   
         jobfile.writelines(command)  
         jobfile.close()
-        os.system('sbatch -p normal -n 1 %s/%s_%s.job' %(job_dir,name,c))
+        os.system('sbatch -p %s -n 1 %s/%s_%s.job' %(queue_name,job_dir,name,c))
