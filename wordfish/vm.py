@@ -195,7 +195,6 @@ def make_plugin_folders(analysis_dir):
     folders = ["corpus","terms","relations"]
     for installed_plugin in installed_plugins:
         tag = installed_plugin[0]["tag"]
-        make_plugin_folder(analysis_dir,"terms",tag,installed_plugin[0]["relations"],"True")
         for folder in folders:
             make_plugin_folder(analysis_dir,folder,tag,installed_plugin[0][folder],"True")
 
