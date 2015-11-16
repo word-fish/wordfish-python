@@ -6,9 +6,11 @@ part of the wordfish python package: extracting relationships of terms from corp
 '''
 
 from wordfish.nlp import text2sentences, sentence2words, find_phrases
+from numpy import average
 from glob import glob
 import gensim
 import pandas
+import os
 
 # Training ######################################################################
 class TrainSentences(object):
@@ -26,6 +28,51 @@ def train_word2vec_model(text_files):
     sentences = TrainSentences(text_files)
     model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
+
+
+# Classification ###############################################################
+
+class DeepTextAnalyzer(object):
+    def __init__(self, word2vec_model):
+        # https://dato.com/learn/gallery/notebooks/deep_text_learning.html
+        """
+        Construct a DeepTextAnalyzer using the input Word2Vec model
+        :param word2vec_model: a trained Word2Vec model
+        """
+        self.model = word2vec_model
+    def text2vectors(self,text):
+        """
+        Convert input text into an iterator that returns the corresponding vector representation of each
+        word in the text, if it exists in the Word2Vec model
+        :param txt: input text
+        :param is_html: if True, then extract the text from the input HTML
+        :return: iterator of vectors created from the words in the text using the Word2Vec model.
+        """
+        words = sentence2words(text)
+        words = [w for w in words if w in self.model]
+        if len(words) != 0:
+            for w in words:
+                yield self.model[w]
+    def text2mean_vector(self,text):
+        """
+        Calculate the average vector representation of the input text
+        :param txt: input text
+        :param is_html: is the text is a HTML
+        :return the average vector of the vector representations of the words in the text  
+        """
+        text = open(text,"rb").read().strip("\n")
+        vectors = self.text2vectors(text)
+        vectors_sum = next(vectors, None)
+        if vectors_sum is None:
+            return None
+        count = 1.0
+        for v in vectors:
+            count += 1
+            vectors_sum = numpy.add(vectors_sum,v)
+        # calculate the average vector and replace +infy and -inf with numeric values 
+        avg_vector = numpy.nan_to_num(vectors_sum/count)
+        return avg_vector
+
 
 def save_models(models,base_dir):
     '''

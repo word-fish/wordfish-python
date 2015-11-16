@@ -24,7 +24,7 @@ For now, the method is as follows:
 '''
 
 # First train simple word2vec model with different corpus
-from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix, extract_vectors
+from wordfish.analysis import train_word2vec_model, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix, extract_vectors, DeepTextAnalyzer
 from wordfish.corpus import get_corpus, get_meta
 from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
@@ -41,12 +41,6 @@ vector_dir = mkdir("%s/vectors" %(analysis_dir))
 
 corpus = get_corpus(base_dir)
 
-# Break up reddit corpus by disorder
-import wordfish.plugins.reddit.functions as reddit
-reddit_corpus = reddit.get_corpus(subset=True)
-
-
-reddit = corpus["reddit"]
 disorders = dict()
 for red in reddit:
     topic = os.path.basename(red).split("_")[0]
@@ -56,6 +50,7 @@ for red in reddit:
         disorders[topic] = [red]
 
 corpus.update(disorders)
+
 
 # Train corpus specific models
 models = dict()
@@ -87,8 +82,41 @@ for model_name,model in models.iteritems():
 
 
 # CLASSIFICATION OF DISORDER with reddit text ############################
+# Can we train a model to predict disorder based on text from reddit?
+# Load meta data associated with corpus, this is where we have labels
 
+meta = get_meta(base_dir)
 
+# First we will generate a vector to describe each reddit post as
+# an average of the words in it from our model. This should be ok
+# to do as the word2vec model does not know anything about 
+# the groupings.
+
+reddit_corpus = get_corpus(base_dir)["reddit"]
+#len(reddit_corpus)
+#121862
+
+# Let's generate a vector of labels
+labels = [os.path.basename(x).split("_")[0] for x in reddit_corpus]
+numbers = [os.path.basename(x).split("_")[1] for x in reddit_corpus]
+
+# Use reddit to build a model
+model = load_models(base_dir,"reddit")
+analyzer = DeepTextAnalyzer(model)
+    
+vectors = pandas.DataFrame(columns=range(300))
+
+for r in range(len(reddit_corpus)):
+    print "%s of %s" %(r,len(reddit_corpus))
+    post = reddit_corpus[r]
+    label = "%s_%s" %(labels[r],numbers[r])
+    # Build a model for everyone else
+    vectors.loc[label] = analyzer.text2mean_vector(post)
+
+# Save pickle of df foruse later
+classifier = {"analyzer":analyzer,"vectors":vectors,"labels":labels}
+import pickle
+pickle.dump(classifier,open("%s/analysis/models/classifier_reddit.pkl" %(base_dir),"wb"))
 
 # NEUROSYNTH #############################################################
 
@@ -123,9 +151,10 @@ for relid,relation in relations.iteritems():
 wordfish_sims.to_csv("%s/sims_wordfish_neurosynth.tsv" %(analysis_dir),sep="\t")
 neurosynth_sims.to_csv("%s/sims_neurosynth_neurosynth.tsv" %(analysis_dir),sep="\t")
 
-# EXPERIMENT 1:
-# Can we train a model to predict disorder based on text from reddit?
-# Load meta data associated with corpus, this is where we have labels
+
+
+# EXPERIMENT 2: compare neurosynth map similarity to word2vec similarities
+
 
 # stopped here - neurosynth missing edges
 
