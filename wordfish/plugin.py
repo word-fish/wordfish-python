@@ -242,7 +242,6 @@ def generate_job(func,category,inputs=None,batch_num=1):
             # First collect all string args - this means same for all scripts
             for varname,elements in inputs.iteritems():
                 if isinstance(elements,str):
-                    elements = [elements]
                     single_input = format_single_input(varname,elements)
                     formatted_inputs = "%s%s" %(formatted_inputs,single_input)
                           
@@ -282,6 +281,8 @@ def generate_job(func,category,inputs=None,batch_num=1):
     
 
 def format_single_input(varname,element):
+    if isinstance(element,str):
+        element = '"%s"' %(element)
     return " %s=%s," %(varname,element) 
 
 def format_inputs(varname,elements):
