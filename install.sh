@@ -26,4 +26,4 @@ python setup.py install --user
 source ~/.bashrc
 
 # Run the script to call the application
-python run.py $WORK
+python run.py

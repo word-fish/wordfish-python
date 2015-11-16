@@ -29,6 +29,7 @@ from wordfish.corpus import get_corpus, get_meta
 from wordfish.terms import merge_terms
 from wordfish.utils import mkdir
 import pandas
+import pickle
 import sys
 import os
 
@@ -107,17 +108,28 @@ analyzer = DeepTextAnalyzer(model)
 vectors = pandas.DataFrame(columns=range(300))
 
 for r in range(len(reddit_corpus)):
-    print "%s of %s" %(r,len(reddit_corpus))
     post = reddit_corpus[r]
     label = "%s_%s" %(labels[r],numbers[r])
     # Build a model for everyone else
-    vectors.loc[label] = analyzer.text2mean_vector(post)
+    if label not in vectors.index:
+        try:
+            print "Processing %s of %s" %(r,len(reddit_corpus))
+            vectors.loc[label] = analyzer.text2mean_vector(post)
+        except:
+            pass
+    if r%10000.0==0:
+        # Save pickle of df foruse later
+        pickle.dump(vectors,open("%s/analysis/models/classifier_reddit.pkl" %(base_dir),"wb"))
 
 # Save pickle of df foruse later
-classifier = {"analyzer":analyzer,"vectors":vectors,"labels":labels}
-import pickle
-pickle.dump(classifier,open("%s/analysis/models/classifier_reddit.pkl" %(base_dir),"wb"))
+pickle.dump(vectors,open("%s/analysis/models/classifier_reddit.pkl" %(base_dir),"wb"))
+classifier = pickle.load(open("%s/analysis/models/classifier_reddit.pkl" %(base_dir),"rb"))
 
+predictions=[]
+for ent in vectors.index:
+    predictions.append(clf2.predict(vectors.loc[ent])[0])
+
+numpy.where(binlabel==1).tolist()
 # NEUROSYNTH #############################################################
 
 # EXPERIMENT 0:

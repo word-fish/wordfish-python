@@ -4,18 +4,14 @@
 import os
 import sys
 from wordfish.vm import init_scripts, make_plugin_folders
-from wordfish.utils import make_directory
+from wordfish.utils import make_directory, wordfish_home
 from wordfish.terms import download_nltk
 
 # DIRECTORIES #####################################################################
-if len(sys.argv) < 2:
-    print 'Please provide a base project folder path as the only input argument.'
-    sys.exit(32)
-analysis_dir = os.path.abspath(sys.argv[1])
-# /work/02092/vsochat/wrangler/
-#corenlp_dir="/%s/SOFTWARE/stanford-corenlp-full-2015-04-20" %(analysis_dir)
+analysis_dir = wordfish_home()
 corpus_output = make_directory("%s/corpus" %(analysis_dir))
 terms_output = make_directory("%s/terms" %(analysis_dir))
+relations_output = make_directory("%s/relations" %(analysis_dir))
 scripts_directory = make_directory("%s/scripts" %(analysis_dir))
 
 # INIT FUNCTIONS ##################################################################

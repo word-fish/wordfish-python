@@ -212,7 +212,7 @@ def generate_job(func,category,inputs=None,batch_num=1):
     func: str
         name of function to call in plugin functions.py
     category: str
-        must be one of "terms" or "corpus" corresponding to output folder
+        must be one of "terms" or "corpus" or "relations" corresponding to output folder
     inputs: dict
         key should be arg name, and value should be list of string args as input to func
         If inputs are not specified, it is assumed that the function will be called once
@@ -234,7 +234,7 @@ def generate_job(func,category,inputs=None,batch_num=1):
     extraction_script = "%s/scripts/run_extractions_%s.job" %(home,tag)
 
     lines_to_add = []      
-    if category in ["corpus","terms"]:
+    if category in ["corpus","terms","relations"]:
         if inputs == None:
             lines_to_add.append("python -c 'from %s import %s; %s(%s)'" %(script,func,func,output_dir))
         else:

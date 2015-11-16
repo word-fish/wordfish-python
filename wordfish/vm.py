@@ -180,7 +180,6 @@ def init_scripts(scripts_dir,output_base):
     scripts_to_move = glob("%s/scripts/*" %(installdir))
     for script in scripts_to_move:
         script_template = get_template(script)
-        script_template = sub_template(script_template,"[SUB_OUTPUTBASE_SUB]",output_base)  
         script_name = os.path.basename(script)
         script_copy = "%s/scripts/%s" %(output_base,script_name)       
         save_template(script_copy,script_template)              
@@ -193,10 +192,10 @@ def make_plugin_folders(analysis_dir):
     '''
     installdir = get_installdir()
     installed_plugins = get_plugins("%s/plugins" %(installdir),load=True)
-    folders = ["corpus","terms"]
+    folders = ["corpus","terms","relations"]
     for installed_plugin in installed_plugins:
         tag = installed_plugin[0]["tag"]
-        make_plugin_folder(analysis_dir,"terms",tag,installed_plugin[0]["relationships"],"True")
+        make_plugin_folder(analysis_dir,"terms",tag,installed_plugin[0]["relations"],"True")
         for folder in folders:
             make_plugin_folder(analysis_dir,folder,tag,installed_plugin[0][folder],"True")
 

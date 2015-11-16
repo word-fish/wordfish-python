@@ -1,7 +1,7 @@
 '''
 terms.py
 
-part of the wordfish python package: extracting relationships of terms from corpus
+part of the wordfish python package: extracting relations between terms from corpus
 
 this set of functions works with different plugins (in plugins folder) to produce input terminologies
 to search for in corpus
@@ -26,55 +26,34 @@ def download_nltk():
     return "%s/nltk_data" %(home)
 
 
-def save_relationships(input_terms,relationships,output_dir=None):
+def save_relations(relations,output_dir=None):
     '''save_relationships
     Parameters
     =========
-    input_terms: list,dict
-        a list or dictionary of terms. If relationships exist between terms,
-        relationships should be defined, with key as the unique ID for the terms.
-        if meta data are used to describe the input_terms, provide the input_terms
-        as a dictionary with a dictionary to define {"meta_label":"meta_value"}
      output_dir: path
         path to save output. If none, will just return json dictionary
-    relationships: list of tuples [(source,target,relation)]
+    relations: list of tuples [(source,target,relation)]
         if defined, all keys must be in input_terms. Not yet decided what a "relation" should be, but for now assume you can have it be a string or number.
     Returns
     =======
-    terms: dict
-        dictionary structure with the following format (parallel to what many d3
-        algorithms use to define graphs)
-
-        {
-         "links": [{"source":"node1","target":"node2","value":0.5}]
-        }
+         list of links
+         [{"source":"node1","target":"node2","value":0.5}]
 
     '''
     # Not sure why anyone would do this, but might as well check
     links = []
-    ids = []
-    if isinstance(input_terms,str):
-        input_terms = [input_terms]
-    if isinstance(input_terms,list):
-        input_terms = [x.lower() for x in input_terms]
-        for term in input_terms:
-            ids.append(term.lower())
-    elif isinstance(input_terms,dict):
-        for node, meta in input_terms.iteritems():
-            ids.append(node.lower())
-    else:
-        print "Invalid input_terms, must be str, dict, or list."
-        return
 
-    # Save relationships
-    for tup in relationships:
-        if tup[0].lower() and tup[1].lower() in ids:
-            links.append({"source":tup[0],"target":tup[1],"value":tup[2]})
+    # Save relations
+    for tup in relations:
+        pair = [tup[0],tup[1]].sort()
+        if output_dir is not None:
+            output_file = "%s/%s_relations.json" %(output_dir,"_".join(pair).replace(" ",""))
+            relation = {"source":tup[0],"target":tup[1],"value":tup[2]}
+            links.append(relation)
+            if not os.path.exists(output_file):
+                tmp = save_pretty_json(relation,output_file)
 
-    result = {"edges":links}
-    if output_dir is not None:
-        tmp = save_pretty_json(result,"%s/term_relationships.json" %(output_dir))
-    return result
+    return links            
 
 def save_terms(input_terms,output_dir=None):
     '''save_terms
@@ -95,7 +74,6 @@ def save_terms(input_terms,output_dir=None):
          }
 
     '''
-    # Not sure why anyone would do this, but might as well check
     nodes = []
     ids = []
     if isinstance(input_terms,str):
