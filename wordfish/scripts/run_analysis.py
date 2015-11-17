@@ -41,6 +41,7 @@ model_dir = mkdir("%s/models" %(analysis_dir))
 vector_dir = mkdir("%s/vectors" %(analysis_dir))
 
 corpus = get_corpus(base_dir)
+reddit = corpus["reddit"]
 
 disorders = dict()
 for red in reddit:
@@ -130,6 +131,62 @@ for ent in vectors.index:
     predictions.append(clf2.predict(vectors.loc[ent])[0])
 
 numpy.where(binlabel==1).tolist()
+
+
+# CLASSIFICATION OF DISORDER with neurosynth text ############################
+# Can we train a model to predict disorder based on text from neurosynth
+
+# Let's use a subset of reddit posts for different disorders
+subset = corpus["anxiety"] + corpus["atheism"]
+len(subset)
+#8188
+
+# Let's generate a vector of labels
+labels = [os.path.basename(x).split("_")[0] for x in subset]
+numbers = [os.path.basename(x).split("_")[1] for x in subset]
+
+# Use reddit to build a model
+model = load_models(base_dir,"reddit")
+analyzer = DeepTextAnalyzer(model)
+    
+vectors = pandas.DataFrame(columns=range(300))
+
+for r in range(len(subset)):
+    post = subset[r]
+    label = "%s_%s" %(labels[r],numbers[r])
+    # Build a model for everyone else
+    if label not in vectors.index:
+        try:
+            print "Processing %s of %s" %(r,len(subset))
+            vectors.loc[label] = analyzer.text2mean_vector(post)
+        except:
+            pass
+
+# Save pickle of df foruse later
+pickle.dump(vectors,open("%s/analysis/models/df_nsyn_anxiety_atheism.pkl" %(base_dir),"wb"))
+
+# Build simple SVM with scikit-learn
+from sklearn import svm
+from numpy.random import choice
+# hold out some for testing
+test = choice(vectors.index,1000)
+test = vectors.loc[test]
+train = [x for x in vectors.index if x not in test]
+train = vectors.loc[train]
+
+clf = svm.SVC()
+clf.fit(train, labels)
+  
+
+# Make a single prediction based on vectors
+predictions=[]
+for vector in vectors.index:
+    predictions.append(clf2.predict(vectors.loc[ent])[0])
+
+numpy.where(binlabel==1).tolist()
+
+
+
 # NEUROSYNTH #############################################################
 
 # EXPERIMENT 0:

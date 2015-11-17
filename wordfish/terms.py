@@ -45,7 +45,8 @@ def save_relations(relations,output_dir=None):
 
     # Save relations
     for tup in relations:
-        pair = [tup[0],tup[1]].sort()
+        pair = [tup[0],tup[1]]
+        pair.sort()
         if output_dir is not None:
             output_file = "%s/%s_relations.json" %(output_dir,"_".join(pair).replace(" ",""))
             relation = {"source":tup[0],"target":tup[1],"value":tup[2]}
