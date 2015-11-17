@@ -8,6 +8,7 @@ part of the wordfish python package: extracting relationships of terms from corp
 from wordfish.nlp import text2sentences, sentence2words, find_phrases
 from numpy import average
 from glob import glob
+import numpy
 import gensim
 import pandas
 import os

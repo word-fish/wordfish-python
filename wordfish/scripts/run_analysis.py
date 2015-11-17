@@ -146,7 +146,7 @@ labels = [os.path.basename(x).split("_")[0] for x in subset]
 numbers = [os.path.basename(x).split("_")[1] for x in subset]
 
 # Use reddit to build a model
-model = load_models(base_dir,"reddit")
+model = load_models(base_dir,"reddit")["reddit"]
 analyzer = DeepTextAnalyzer(model)
     
 vectors = pandas.DataFrame(columns=range(300))
@@ -163,6 +163,7 @@ for r in range(len(subset)):
             pass
 
 # Save pickle of df foruse later
+vectors = vectors.fillna(0)
 pickle.dump(vectors,open("%s/analysis/models/df_nsyn_anxiety_atheism.pkl" %(base_dir),"wb"))
 
 # Build simple SVM with scikit-learn
