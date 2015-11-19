@@ -5,9 +5,11 @@ part of the wordfish python package: specific machine learning models
 
 '''
 
-from glob import glob
+from numpy.random import choice
+from sklearn import svm
 import numpy
 import pandas
+import sys
 import os
 
 
