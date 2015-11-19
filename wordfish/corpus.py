@@ -98,3 +98,21 @@ def get_corpus(analysis_dir):
             corpus[corpus_name] = sentences
     return corpus
 
+
+def subset_corpus(corpus,delim="_",position=0):
+    '''subset_corpus
+    return a subset of the corpus based on 
+    splitting the file name by delimiter "delim" 
+    [default is "_"] at position "position" [default is 0]
+    '''
+    subset = dict()
+    for document in corpus:
+        topic = os.path.basename(document).split(delim)[position]
+    if topic in subset:
+        subset[topic].append(document)
+    else:
+        sybset[topic] = [document]
+    return subset
+
+
+

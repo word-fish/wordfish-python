@@ -82,6 +82,18 @@ def save_models(models,base_dir):
     for model_key,model in models.iteritems():
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
+def build_models(corpus):
+    models = dict()
+    print "Training models..."
+    for corpus_id,sentences in corpus.iteritems():
+        try:
+            models[topic] = train_word2vec_model(sentences)
+        except:
+            print "Error building model for %s" %(topic)
+            pass
+    return models
+
+
 def load_models(base_dir,model_keys=None):
     if isinstance(model_keys,str): model_keys = [model_keys]
     models = dict()
@@ -94,6 +106,13 @@ def load_models(base_dir,model_keys=None):
         if os.path.exists(model_file):
             models[model_key] = gensim.models.Word2Vec.load(model_file)
     return models
+
+def export_vectors(models,output_dir,sep="\t"):
+    # Export vectors
+    for model_name,model in models.iteritems():
+        print "Processing %s" %(model_name)
+        vecs = extract_vectors(model)
+        vecs.to_csv("%s/%s.tsv" %(output_dir,model_name),sep=sep)
 
 
 def extract_vectors(model,vocab=None):
@@ -176,3 +195,78 @@ def vocab_term_intersect(terms,model):
             # (697, 3160, u'somatosensation', 'somatosensory')
             intersects[tag] = phrases
     return intersects
+
+
+# Create a matrix of labels, keep track of which abstracts are labeled
+labels = pandas.DataFrame(columns=term_names)
+
+for r in range(len(meta)):
+    meta_file = meta[r]
+    text = meta_file.replace("_meta","_sentences")
+    label = os.path.basename(text).split("_")[0]
+    # Build a model for everyone else
+    if label not in vectors.index:
+        try:
+            print "Processing %s of %s" %(r,len(meta))
+            vectors.loc[label] = analyzer.text2mean_vector(text)
+            labels.loc[label,read_json(meta_file)["labels"]] = 1
+        except:
+            pass
+
+
+def get_labels(meta):
+    labels = []
+    for r in range(len(meta)):
+        meta_file = meta[r]
+        labels = numpy.unique(labels + read_json(meta_file)["labels"]).tolist() 
+    return labels
+
+
+def featurize_to_corpus(model,meta,size=300,fillna=True):
+    '''featurize_to_corpus
+    generate average feature vectors for a set of documents and their labels based
+    on an existing model (model). The meta json file should describe text and labels
+    '''   
+    analyzer = DeepTextAnalyzer(model)
+    vectors = pandas.DataFrame(columns=range(size))
+
+    # Get all unique term names from the meta objects
+    term_names = get_labels(meta=meta)
+
+    # Create a matrix of labels, keep track of which abstracts are labeled
+    labels = pandas.DataFrame(columns=term_names)
+
+    for r in range(len(meta)):
+        meta_file = meta[r]
+        text = meta_file.replace("_meta","_sentences")
+        label = os.path.basename(text).split("_")[0]
+    # Build a model for everyone else
+    if label not in vectors.index:
+        try:
+            print "Processing %s of %s" %(r,len(meta))
+            vectors.loc[label] = analyzer.text2mean_vector(text)
+            labels.loc[label,read_json(meta_file)["labels"]] = 1
+        except:
+            pass
+
+
+    count = 1
+    for r in range(len(meta)):
+        meta_file = meta[r]
+        post = meta_file.replace("_meta","_sentences")
+
+        # Build a model by taking the mean vector
+        if count not in vectors.index:
+            try:
+                print "Processing %s of %s" %(r,len(meta))
+                vectors.loc[count] = analyzer.text2mean_vector(post)
+                labels.loc[count,read_json(meta_file)["labels"]] = 1
+                count+=1
+            except:
+                pass
+        
+    if fillna:
+        labels = labels.fillna(0)
+        vectors = vectors.fillna(0)
+
+    return vectors,labels

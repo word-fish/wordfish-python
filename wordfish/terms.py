@@ -9,6 +9,7 @@ to search for in corpus
 '''
 from wordfish.utils import save_pretty_json, find_directories, read_json
 from uuid import uuid4
+from glob import glob
 import pandas
 import nltk
 import os
@@ -100,7 +101,7 @@ def save_terms(input_terms,output_dir=None):
     return result
 
 
-def merge_terms(analysis_dir,subset=False):
+def get_terms(analysis_dir,subset=True):
     '''
     For all terms defined, and relationships for the terms, parse into a single data structure
     This (maybe) won't work for larger datasets (we will use a database) but it will for testing.
@@ -171,3 +172,52 @@ def merge_terms(analysis_dir,subset=False):
     if analysis_dir is not None:
         tmp = save_pretty_json(result,"%s/terms/terms.json" %(analysis_dir))
     return result
+
+def get_relations(base_dir,tags=None,read=False):
+    edges = dict()
+    if isinstance(tags,str):
+        tags = [tags]
+    relations_dir = "%s/relations" %(os.path.abspath(base_dir))
+    if tags == None:
+        tags = [os.path.basename(x) for x in find_directories(relations_dir)]
+    for tag in tags:
+        print "Finding relations for %s" %(tag)
+        relations_files = glob("%s/%s/*_relations.json" %(relations_dir,tag))
+        if len(relations_files) != 0:
+            if read:
+                edges[tag] = read_relations(relations_files)
+            else:
+                edges[tag] = relations_files       
+    return edges
+
+# This is inefficient, we really need a document database
+def get_relations_df(base_dir,tags=None):
+    if isinstance(tags,str):
+        tags = [tags]
+    relations_dir = "%s/relations" %(os.path.abspath(base_dir))
+    if tags == None:
+        tags = [os.path.basename(x) for x in find_directories(relations_dir)]
+    for tag in tags:
+        print "Finding relations for %s" %(tag)
+        relations_files = glob("%s/%s/*_relations.json" %(relations_dir,tag))
+        term_names = numpy.unique([x.split("_")[0] for x in relations_files]).tolist()
+        edges = pandas.DataFrame(columns=term_names,index=term_names)
+        for r in range(len(relations_files)):
+            relation_file = relations_files[r]
+            print "Parsing %s of %s" %(r,len(relations_files))
+            term1,term2=os.path.basename(relation_file).split("_")[0:2]      
+            edges.loc[term1,term2] = read_json(relation_file)["value"]
+            edges.loc[term2,term1] = read_json(relation_file)["value"]
+        relations[tag] = edges
+    return relations
+
+def read_relations(relations_list,search_expression=None):
+    if search_expression != None:
+        expression = re.compile(search_expression)
+        return [read_json(x) for x in relations_files if expression.search(x)]
+    else:
+        relations = []
+        for x in range(len(relations_files)):
+            print "Parsing %s of %s" %(x,len(relations_files))  
+            relations.append(read_json(relations_files[x])) 
+
