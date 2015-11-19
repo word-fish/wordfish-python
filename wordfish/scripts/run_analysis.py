@@ -18,17 +18,11 @@ For now, the method is as follows:
 '''
 
 # First train simple word2vec model with different corpus
-from wordfish.analysis import build_models, save_models, export_models_tsv, load_models, vocab_term_intersect, extract_similarity_matrix, export_vectors, featurize_to_corpus
+from wordfish.analysis import build_models, save_models, export_models_tsv, load_models, extract_similarity_matrix, export_vectors, featurize_to_corpus
 from wordfish.models import build_svm
 from wordfish.corpus import get_corpus, get_meta, subset_corpus
-from wordfish.terms import get_terms, get_relations_df
-from numpy.random import choice
+from wordfish.terms import get_terms
 from wordfish.utils import mkdir
-from sklearn import svm
-import numpy
-import pandas
-import pickle
-import sys
 import os
 
 base_dir = os.environ["WORDFISH_HOME"]
@@ -36,11 +30,7 @@ base_dir = os.environ["WORDFISH_HOME"]
 # Setup analysis output directories
 analysis_dir = mkdir("%s/analysis" %(base_dir))
 model_dir = mkdir("%s/models" %(analysis_dir))
-df_dir = mkdir("%s/df" %(analysis_dir))
 vector_dir = mkdir("%s/vectors" %(analysis_dir))
-df_dir = mkdir("%s/df" %(analysis_dir))
-svm_dir = mkdir("%s/svms" %(analysis_dir))
-
 
 # Generate more specific corpus by way of file naming scheme
 corpus = get_corpus(base_dir)
@@ -130,4 +120,4 @@ wordfish_sims = extract_similarity_matrix(models["neurosynth"])
 model = load_models(base_dir,"neurosynth")["neurosynth"]
 meta = get_meta(base_dir)["neurosynth"]
 vectors,labels = featurize_to_corpus(model,meta)
-classifiers = build_svm(vectors=vectors,label_matrix=labels,kernel="linear")
+classifiers = build_svm(vectors=vectors,labels=labels,kernel="linear")
