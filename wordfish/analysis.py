@@ -6,6 +6,7 @@ part of the wordfish python package: extracting relationships of terms from corp
 '''
 
 from wordfish.nlp import text2sentences, sentence2words, find_phrases
+from wordfish.utils import read_json
 from numpy import average
 from glob import glob
 import numpy
@@ -229,13 +230,10 @@ def featurize_to_corpus(model,meta,size=300,fillna=True):
     '''   
     analyzer = DeepTextAnalyzer(model)
     vectors = pandas.DataFrame(columns=range(size))
-
     # Get all unique term names from the meta objects
     term_names = get_labels(meta=meta)
-
     # Create a matrix of labels, keep track of which abstracts are labeled
     labels = pandas.DataFrame(columns=term_names)
-
     for r in range(len(meta)):
         meta_file = meta[r]
         text = meta_file.replace("_meta","_sentences")
@@ -248,13 +246,10 @@ def featurize_to_corpus(model,meta,size=300,fillna=True):
             labels.loc[label,read_json(meta_file)["labels"]] = 1
         except:
             pass
-
-
     count = 1
     for r in range(len(meta)):
         meta_file = meta[r]
         post = meta_file.replace("_meta","_sentences")
-
         # Build a model by taking the mean vector
         if count not in vectors.index:
             try:
@@ -264,9 +259,7 @@ def featurize_to_corpus(model,meta,size=300,fillna=True):
                 count+=1
             except:
                 pass
-        
     if fillna:
         labels = labels.fillna(0)
         vectors = vectors.fillna(0)
-
     return vectors,labels
