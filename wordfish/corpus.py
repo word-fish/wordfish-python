@@ -108,10 +108,10 @@ def subset_corpus(corpus,delim="_",position=0):
     subset = dict()
     for document in corpus:
         topic = os.path.basename(document).split(delim)[position]
-    if topic in subset:
-        subset[topic].append(document)
-    else:
-        sybset[topic] = [document]
+        if topic in subset:
+            subset[topic].append(document)
+        else:
+            subset[topic] = [document]
     return subset
 
 
