@@ -88,9 +88,9 @@ def build_models(corpus):
     print "Training models..."
     for corpus_id,sentences in corpus.iteritems():
         try:
-            models[topic] = train_word2vec_model(sentences)
+            models[corpus_id] = train_word2vec_model(sentences)
         except:
-            print "Error building model for %s" %(topic)
+            print "Error building model for %s" %(corpus_id)
             pass
     return models
 
