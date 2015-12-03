@@ -24,7 +24,6 @@ def build_svm(vectors,labels,kernel="linear",positive_label=1,negative_label=0,t
     term_names = labels.columns.tolist()
     for term in term_names:
         if "%s_%s" %(term,kernel) not in classifiers.index:
-            print "Parsing term %s" %(term)
             data_Y = labels[term]
             positive_examples = data_Y.index[data_Y==positive_label]
             negative_examples = data_Y.index[data_Y==negative_label]
