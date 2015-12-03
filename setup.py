@@ -2,22 +2,13 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-here = os.path.abspath(os.path.dirname(__file__))
-
-# Get requires from requirements.txt
-reqs = [line.strip() for line in open('requirements.txt').readlines()]
-requirements = list(filter(None, reqs))
-
-# Get the long description from the relevant file
-with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
 
 setup(
     # Application name:
     name="wordfish",
 
     # Version number (initial):
-    version="1.0.0",
+    version="0.1",
 
     # Application author details:
     author="Poldracklab",
@@ -31,14 +22,13 @@ setup(
     zip_safe=False,
 
     # Details
-    url="http://www.github.com/vsoch/wordfish-python",
+    url="http://www.github.com/word-fish/wordfish-python",
 
     license="LICENSE.txt",
     description="Infrastructure for finding relationships between terms in corpus of interest.",
-    long_description=long_description,
     keywords='wordfish, nlp, text parsing',
 
-    install_requires = requirements,
+    install_requires = ["numpy","nltk","gitdb","smmap","flask","gitpython","gensim","graphlab-create","xmltodict"]
 
     entry_points = {
         'console_scripts': [
