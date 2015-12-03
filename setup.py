@@ -8,7 +8,7 @@ setup(
     name="wordfish",
 
     # Version number (initial):
-    version="0.1",
+    version="0.2",
 
     # Application author details:
     author="Poldracklab",
