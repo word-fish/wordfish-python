@@ -12,7 +12,6 @@ import pandas
 import sys
 import os
 
-
 def build_svm(vectors,labels,kernel="linear",positive_label=1,negative_label=0,testing_holdout=0.2):
     '''build_svm
     vectors: a data frame of vectors to be used for training and testing

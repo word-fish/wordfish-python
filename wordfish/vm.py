@@ -7,9 +7,9 @@ from wordfish.utils import copy_directory, get_template, save_template, get_inst
 from wordfish.plugin import get_plugins, move_plugins, load_plugins, go_fish, load_plugin
 from git import Repo
 from glob import glob
-import numpy
 import tempfile
 import shutil
+import numpy
 import re
 import os
 

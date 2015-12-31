@@ -44,7 +44,7 @@
 	                <ul class="nav navbar-nav navbar-right">
 			    <li>
 			        <span class="li-text">Ways to</span> 
-				    <a href="#"><strong> contact</strong></a> 
+				    <a href="mailto:vsochat@stanford.edu"><strong> contact</strong></a> 
 				    <span class="li-text"> us:</span> 
 				    <span class="li-social">
 					<a href="#"><i class="fa fa-envelope"></i></a> 
@@ -94,117 +94,13 @@
 				                        	<label class="sr-only" for="form-about-yourself">Description</label>
 				                        	<textarea name="form-about-yourself" placeholder="Description..." 
 				                        				class="form-about-yourself form-control" id="form-about-yourself"></textarea>
-				                        </div>
-				                        <button type="button" class="btn btn-next">Next</button>
+ 				                        </div>
+           
+ 				                        <button type="submit" class="btn">Go Fish!</button>
+
 				                    </div>
 			                    </fieldset>
-			                    
-			                    <fieldset>
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Database</h3>
-		                            		<p>Set up your account:</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<i class="fa fa-database"></i>
-		                        		</div>
-		                            </div>
-		                            <div class="form-bottom">
-
-                                  <!-- Database user choice-->
-                                      <div class="form-group radio">
-                                          <label><input type="radio" id="automatic" value="automatic" name="dbsetupchoice">Please set it up for me.</label>
-                                      </div>
-                                      <div class="form-group radio">
-                                          <label><input type="radio" id="manual" value="manual" name="dbsetupchoice">I want to specify the connection parameters.</label>
-                                      </div>
-
-                                  <div id="manual_setup" style="display:none">
-		                              <div class="form-group">
-		                                  <label>host</label>
-		                                  <input type="text" id="dbhost" name="dbhost" class="form-control" placeholder="mysql-university.edu">
-		                              </div>
-		                              <div class="form-group">
-		                                  <label>username</label>
-		                                  <input type="text" id="dbusername" name="dbusername" class="form-control" placeholder="psiturkpy">
-		                              </div>
-		                              <div class="form-group">
-		                                  <label>table name</label>
-		                                  <input type="text" id="dbtable" name="dbtable" class="form-control" placeholder="dining-room-table">
-		              
-		                              </div>
-		                              <div class="form-group">
-		                                  <label>database name</label>
-		                                  <input type="text" id="dbname" name="dbname" class="form-control" placeholder="psiturkpy-database">
-		                              </div>
-		                              <div class="form-group">
-		                                  <label>Database Type</label><br>
-		                                  <select name="dbtype" class="form-control">
-		                                      <option value="mysql"> MySQL </option>
-                                                      <option value="postgresql"> PostgreSQL </option>
-		                                  </select>
-		                              </div>
-				              <div class="form-group">
-				                  <label class="sr-only" for="form-password">Password</label>
-				                  <input type="password" name="form-password" placeholder="Password..." class="form-password form-control" id="form-password">
-				              </div>
-				              <div class="form-group">
-				                  <label class="sr-only" for="form-repeat-password">Repeat password</label>
-				                  <input type="password" name="form-repeat-password" placeholder="Repeat password..." class="form-repeat-password form-control" id="form-repeat-password">
-		                             </div>
-			                     </div>
-                                             <div style="padding-top:30px">
-			                          <button type="button" class="btn btn-previous">Previous</button>
-			                          <button type="button" class="btn btn-next">Next</button>
-                                             </div>
-                                        </div>
-			               </fieldset>
-			                    
-			                    <fieldset>
-		                        	<div class="form-top">
-		                        		<div class="form-top-left">
-		                        			<h3>Deployment</h3>
-		                            		<p>please choose your deployment</p>
-		                        		</div>
-		                        		<div class="form-top-right">
-		                        			<i class="fa fa-database"></i>
-		                        		</div>
-		                            </div>
-		                            <div class="form-bottom">
-
-                                               <div class="row" style="padding-bottom:30px">
-                                                   <div class="col-md-4" style="padding-left:40px">
-							<div class="radio">
-				                              <input type="radio"  name="deploychoice" value="folder" type="text" checked="checked"></input>
-				                              <div class="icon"><i class="fa fa-5x fa-folder"></i></div>
-				                              <h6>Folder </h6>
-				                        </div>
-                                                  </div>
-                                                   <div class="col-md-4" style="padding-left:40px">
-				                          <div class="radio">
-				                              <input type="radio"  name="deploychoice" value="vagrant">
-				                              <div class="icon"><i class="fa fa-5x fa-desktop"></i></div>
-				                              <h6>Vagrant </h6>
-				                          </div>  
-                                                  </div>
-                                                   <div class="col-md-4" style="padding-left:40px">
-				                      <div class="radio">
-				                              <input type="radio"  name="deploychoice" value="aws">
-				                              <div class="icon">
-				                                  <i class="fa fa-5x fa-cloud"></i>
-				                              </div>
-				                              <h6>AWS </h6>
-		                                      </div>
-                                                  </div>
-                                          </div>  
-                                                <button type="button" class="btn btn-previous">Previous</button>
-				                <button type="submit" class="btn">Create!</button>
-				            </div>
-			                </fieldset>
-
-                                        <!-- Hidden fields to pass to next page-->
-                                        <input name="tmpdir" id="tmpdir" type="hidden" class="form-control">
-
+			                   
 		                    
 		                    </form>
 		                    
@@ -236,23 +132,6 @@
       {% endif %}
 
       $("#tmpdir").val("{{ tmpdir }}");
-      $( "#automatic" ).prop( "checked", true );
-      $("#dbhost").val("mysql.stanford.edu")
-      $("#dbtable").val("wordfish_table")
-      $("#dbname").val("wordfish_database")
-      $("#dbusername").val("wordfish")
-      $("#form-repeat-password").val("wordfish")
-      $("#form-password").val("wordfish")
-
-      // Show or hide database setup based on user preference
-      $('input[type=radio][name=dbsetupchoice]').change(function() {
-        if (this.value == 'manual') {
-            $("#manual_setup").show()
-        }
-        else if (this.value == 'automatic') {
-            $("#manual_setup").hide()
-        }
-      });
     });
 
 </script>

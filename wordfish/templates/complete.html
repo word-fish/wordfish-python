@@ -71,11 +71,16 @@
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3 form-box">
 
-                             <h4 class="info-text"> You can find your app:</h4>
+                             <h4 class="info-text"> Download your python module:</h4>
                                  <div class="icon">
                                      <i class="fa fa-5x fa-optin-monster" style="padding-top:35px"></i>
-                                 </div>             
-                                 <h3 style="color:white">{{ app_dest }}</h3>
+                                 </div>  
+
+                                     <!-- Download ZIP application -->           
+                                     <form method="get" action="file.doc">
+                                         <h3 type="submit" style="color:white"><a href="{{ app_dest }}">Download ZIP</a></h3>
+                                     </form>
+                                 
                         </div>
                     </div>
                 </div>

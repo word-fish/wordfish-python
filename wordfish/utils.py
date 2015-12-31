@@ -8,6 +8,7 @@ from urllib2 import Request, urlopen, HTTPError
 from glob import glob
 import errno
 import tarfile
+import zipfile
 import urllib2
 import json
 import shutil
@@ -207,3 +208,11 @@ def has_internet_connectivity():
         return True
     except urllib2.URLError as err: pass
     return False
+
+def make_zip(path,out_zip):
+    zipper = zipfile.ZipFile(out_zip, 'w')
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            zipper.write(os.path.join(root, file))
+    zipper.close()
+    return out_zip

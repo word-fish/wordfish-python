@@ -55,14 +55,15 @@ class DeepTextAnalyzer(object):
         if len(words) != 0:
             for w in words:
                 yield self.model[w]
-    def text2mean_vector(self,text):
+    def text2mean_vector(self,text,read_file=True):
         """
         Calculate the average vector representation of the input text
         :param txt: input text
         :param is_html: is the text is a HTML
         :return the average vector of the vector representations of the words in the text  
         """
-        text = open(text,"rb").read().strip("\n")
+        if read_file == True:
+            text = open(text,"rb").read().strip("\n")
         vectors = self.text2vectors(text)
         vectors_sum = next(vectors, None)
         if vectors_sum is None:

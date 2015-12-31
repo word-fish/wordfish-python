@@ -25,6 +25,14 @@ def text2sentences(text,remove_non_english_chars=True):
     for s in tokenizer.tokenize(text):
             yield s
 
+def processText(text):
+    '''combines text2sentences and sentence2words'''
+    vector = []
+    for line in text2sentences(text):            
+        words = sentence2words(line)
+        vector = vector + words
+    return vector
+
 def sentence2words(sentence,remove_stop_words=True,lower=True):
     if isinstance(sentence,list): sentence = sentence[0]
     re_white_space = re.compile("\s+")
