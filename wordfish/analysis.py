@@ -31,6 +31,11 @@ def train_word2vec_model(text_files):
     model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
 
+def train_lda_model(text_files):
+    sentences = TrainSentences(text_files)
+    model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
+    return model
+
 
 # Classification ###############################################################
 
@@ -84,12 +89,15 @@ def save_models(models,base_dir):
     for model_key,model in models.iteritems():
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
-def build_models(corpus):
+def build_models(corpus,model_type="word2vec"):
     models = dict()
     print "Training models..."
     for corpus_id,sentences in corpus.iteritems():
         try:
-            models[corpus_id] = train_word2vec_model(sentences)
+            if model_type == "word2vec":
+                models[corpus_id] = train_word2vec_model(sentences)
+            else:
+                models[corpus_id] = train_lda_model(sentences)
         except:
             print "Error building model for %s" %(corpus_id)
             pass

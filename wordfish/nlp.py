@@ -4,7 +4,6 @@ nlp:part of the wordfish python package: extracting relationships of terms from 
 functions for simple natural language processing
 
 '''
-
 from textblob import TextBlob, Word
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
@@ -23,7 +22,7 @@ def text2sentences(text,remove_non_english_chars=True):
     if remove_non_english_chars:
         text = remove_nonenglish_chars(text)
     for s in tokenizer.tokenize(text):
-            yield s
+        yield s
 
 def processText(text):
     '''combines text2sentences and sentence2words'''
