@@ -30,9 +30,6 @@ Call the tool to configure your application:
 
 ![view1](example/img/view1.png)
 
-Setup your database, or have the tool set it up for you.
-![view2](example/img/view2.png)
-
 Select your terminologies and corpus.
 ![view4](example/img/view4.png)
 
@@ -93,21 +90,12 @@ The jobs are going to generate output to fill in the following file structure in
 
 The folders are generated dynamically by the `run.py` script for each corpus and terms plugin based on the "tag" variable in the plugin's config. Relationships, by way of being associated with terms, are stored in the equivalent folder, and the process is only separate because it is not the case that all plugins for terms can have relationships defined. The corpus are kept separate at this step as the output has not been parsed into the wordfish standard to allow integration across corpus and terminologies, at which point wordfish unique IDs will be assigned. 
 
-** under development **
-more details to come as they are figured out, coded, etc.
-
 
 
 #### Deployment Options
 
-Right now the only option (that works) is to generate a folder and install on a cluster, however I have plans to generate a version to install and run on a virtual machine, either with vagrant (local) or vagrant with amazon web services, and I am also thinking about docker for easy cloud deployment.
+Right now the only option (that works) is to generate a folder and install on a cluster, however if there is interest or need, I can generate a version to install and run on a virtual machine, either with vagrant (local) or vagrant with amazon web services, and I am also thinking about docker for easy cloud deployment.
 
-
-### Standards
-Standards will be different kinds of file structures that the module will know how to parse. Including:
-
-- owl: a structured language (ontology) is an extension of an RDF file, and an obvious candidate to define different mentions.
-- nifti: is a brainmap image, for an atlas or brain map (also structured, an XML file and nifti image)
 
 ### Plugins 
 Plugins will be resources from which to derive corpus and/or terminology (terms). Optionally, a terminology can also have relationships. To see an initial list of available plugins, see the [wordfish-plugins](http://www.github.com/word-fish/wordfish-plugins) repo.
