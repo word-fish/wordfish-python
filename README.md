@@ -33,10 +33,11 @@ Call the tool to configure your application:
 ![view1](example/img/view1.png)
 
 Select your terminologies and corpus.
-![view4](example/img/view4.png)
+![view2](example/img/view2.png)
+![view3](example/img/view3.png)
 
 A custom application is generated for you!
-![view5](example/img/view5.png)
+![view4](example/img/view4.png)
 
 
 This will produce a folder for you to drop in your cluster environment.
