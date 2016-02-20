@@ -1,5 +1,7 @@
 # wordfish-python
 
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.46348.svg)](http://dx.doi.org/10.5281/zenodo.46348)
+
   >>   If pulling a thread of meaning from woven text <br>
   >>   is that which your heart does wish. <br>
   >>   Not so absurd or seemingly complex,  <br>
