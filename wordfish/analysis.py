@@ -16,23 +16,23 @@ import os
 
 # Training ######################################################################
 class TrainSentences(object):
-    def __init__(self, text_files):
+    def __init__(self, text_files,remove_stop_words=True,remove_non_english_chars=True):
        self.files = text_files
     def __iter__(self):
         for input_file in self.files:
             for text in file(input_file, "rb"):
-                for line in text2sentences(text):            
-                    words = sentence2words(line)
+                for line in text2sentences(text,remove_non_english_chars=remove_non_english_chars):            
+                    words = sentence2words(line,remove_stop_words=remove_stop_words)
                     if len(words) < 3: continue    
                     yield words
 
-def train_word2vec_model(text_files):
-    sentences = TrainSentences(text_files)
+def train_word2vec_model(text_files,remove_non_english_chars=True,remove_stop_words=True):
+    sentences = TrainSentences(text_files,remove_stop_words,remove_non_english_chars)
     model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
 
-def train_lda_model(text_files):
-    sentences = TrainSentences(text_files)
+def train_lda_model(text_files,remove_non_english_chars=True,remove_stop_words=True):
+    sentences = TrainSentences(text_files,remove_stop_words,remove_non_english_chars)
     model = gensim.models.Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
 
@@ -89,15 +89,15 @@ def save_models(models,base_dir):
     for model_key,model in models.iteritems():
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
-def build_models(corpus,model_type="word2vec"):
+def build_models(corpus,model_type="word2vec",remove_non_english_chars=True,remove_stop_words=True):
     models = dict()
     print "Training models..."
     for corpus_id,sentences in corpus.iteritems():
         try:
             if model_type == "word2vec":
-                models[corpus_id] = train_word2vec_model(sentences)
+                models[corpus_id] = train_word2vec_model(sentences,remove_non_english_chars,remove_stop_words)
             else:
-                models[corpus_id] = train_lda_model(sentences)
+                models[corpus_id] = train_lda_model(sentences,remove_non_english_chars,remove_stop_words)
         except:
             print "Error building model for %s" %(corpus_id)
             pass

@@ -14,8 +14,11 @@ import pandas
 import gensim
 import re
 
+
 def remove_nonenglish_chars(text):
     return re.sub("[^a-zA-Z]", " ", text)
+
+
     
 def text2sentences(text,remove_non_english_chars=True):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')    
@@ -24,6 +27,8 @@ def text2sentences(text,remove_non_english_chars=True):
     for s in tokenizer.tokenize(text):
         yield s
 
+
+
 def processText(text):
     '''combines text2sentences and sentence2words'''
     vector = []
@@ -31,6 +36,8 @@ def processText(text):
         words = sentence2words(line)
         vector = vector + words
     return vector
+
+
 
 def sentence2words(sentence,remove_stop_words=True,lower=True):
     if isinstance(sentence,list): sentence = sentence[0]
@@ -41,6 +48,8 @@ def sentence2words(sentence,remove_stop_words=True,lower=True):
     if remove_stop_words:
         words = [w for w in words if w not in stop_words]
     return words
+
+
 
 def do_stem(words,return_unique=True,remove_non_english_words=True):
     '''do_stem
@@ -64,6 +73,8 @@ def do_stem(words,return_unique=True,remove_non_english_words=True):
     else:
         return stems
 
+
+
 def get_total_words(text):
     '''get_total_words:
     get total words in a text (dict, string, or list)
@@ -77,7 +88,6 @@ def get_total_words(text):
         total count of words
     '''
     totalwords = 0
-
     # Dictionary
     if isinstance(text,dict):
         for label,sentences in text.iteritems():
@@ -88,7 +98,6 @@ def get_total_words(text):
                 words = do_stem(blob.words)
                 totalwords += len(words)
         return totalwords    
-
     # String or list
     elif isinstance(text,str):
         text = [text]
@@ -97,6 +106,7 @@ def get_total_words(text):
         words = do_stem(blob.words)
         totalwords += len(words)
     return totalwords
+
 
 
 def get_term_counts(terms,text):
@@ -120,6 +130,7 @@ def get_term_counts(terms,text):
         text = [text]
     elif isinstance(text,list):
         return get_term_counts_list(terms,text)
+
 
 
 def get_term_counts_list(terms,text):
