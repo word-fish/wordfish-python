@@ -111,7 +111,7 @@ def sims():
 def main(port=8088):
     if port==None:
         port=8088
-    print "Let's Fish!"
+    print("Let's Fish!")
     webbrowser.open("http://localhost:%s" %(port))
     app.run(host="0.0.0.0",debug=True,port=port)
     

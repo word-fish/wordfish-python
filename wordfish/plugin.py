@@ -36,7 +36,7 @@ def get_validation_fields():
             ("doi",0,str)]
            
 def notvalid(reason):
-    print reason
+    print(reason)
     return False
 
 
@@ -134,7 +134,7 @@ def get_plugins(plugin_repo=None,load=False):
 
     plugins = find_directories(plugin_repo)
     valid_plugins = [p for p in plugins if validate(p)]
-    print "Found %s valid plugins" %(len(valid_plugins))
+    print("Found %s valid plugins" %(len(valid_plugins)))
     if load == True:
         valid_plugins = load_plugins(valid_plugins)
     return valid_plugins
@@ -177,7 +177,7 @@ def load_plugin(plugin_folder):
         meta = remove_unicode_dict(meta[0])
         return [meta]
     except ValueError as e:
-        print "Problem reading config.json, %s" %(e)
+        print("Problem reading config.json, %s" %(e))
 
 
 def move_plugins(valid_plugins,app_dest):
@@ -195,7 +195,7 @@ def move_plugins(valid_plugins,app_dest):
             copy_directory(valid_plugin,"%s/wordfish/plugins/%s" %(app_dest,plugin_folder))
             moved_plugins.append(valid_plugin)
         except:
-           print "Cannot move %s, will not be installed." %(valid_plugin)
+           print("Cannot move %s, will not be installed." %(valid_plugin))
     return moved_plugins
 
 # EXTRACTION JOBS ############################################################

@@ -4,17 +4,16 @@ part of the wordfish python tools
 
 '''
 
-from urllib2 import Request, urlopen, HTTPError
 from glob import glob
 import errno
 import tarfile
 import zipfile
-import urllib2
+import requests
 import json
 import shutil
 import os
 import re
-import __init__
+import wordfish.hello as hello
 import pickle
 
 def wordfish_home():
@@ -25,7 +24,7 @@ def save_pretty_json(dict_obj,output_file):
         json.dump(dict_obj,outfile)
 
 def get_installdir():
-    return os.path.dirname(os.path.abspath(__init__.__file__))
+    return os.path.dirname(os.path.abspath(hello.__file__))
 
 def save_pkl(save_obj,pickle_file):
     pickle.dump(save_obj,open(pickle_file,"wb"))
@@ -185,13 +184,14 @@ def add_lines(script,lines_to_add):
 
 # INTERNET ################################################
 def get_url(url):
-    request = Request(url)
-    response = urlopen(request)
-    return response.read()
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    return None
 
 def get_json(url):
     '''Return general json'''
-    print url
+    print(url)
     json_single = get_url(url)
     return json.loads(json_single.decode("utf-8"))
 
@@ -204,9 +204,11 @@ def has_internet_connectivity():
     retrieve google IP address. Returns True/False
     """
     try:
-        response=urllib2.urlopen('http://www.google.com',timeout=1)
-        return True
-    except urllib2.URLError as err: pass
+        response = requests.get('http://www.google.com')
+        if response.status_code == 200:
+            return True
+    except:
+        pass
     return False
 
 def make_zip(path,out_zip):

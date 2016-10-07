@@ -8,7 +8,7 @@ setup(
     name="wordfish",
 
     # Version number (initial):
-    version="1.0",
+    version="1.1",
 
     # Application author details:
     author="Poldracklab",
@@ -28,7 +28,7 @@ setup(
     description="Infrastructure for finding relationships between terms in corpus of interest.",
     keywords='wordfish, nlp, text parsing',
 
-    install_requires = ["numpy","nltk","gitdb","smmap","flask","gitpython","gensim","xmltodict"],
+    install_requires = ["numpy","nltk","gitdb","smmap","flask","gitpython","gensim","xmltodict","pandas","textblob"],
 
     entry_points = {
         'console_scripts': [

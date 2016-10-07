@@ -54,7 +54,7 @@ def generate_app(app_dest,app_repo=None,plugin_repo=None,plugins=None):
         setup_extraction(valid_plugins,app_dest)
 
     else:
-        print "Folder exists at %s, cannot generate." %(battery_dest)
+        print("Folder exists at %s, cannot generate." %(battery_dest))
 
 
 def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
@@ -70,7 +70,7 @@ def custom_app_download(tmpdir=None,repo_types=["plugins","python"]):
         if repo in acceptable_types:
             download_repo("https://www.github.com/word-fish/wordfish-%s" %(repo),"%s/%s" %(tmpdir,repo))
         else:
-            print "%s is not an acceptable option for repo_types." %(repo)
+            print("%s is not an acceptable option for repo_types." %(repo))
     return tmpdir
 
 
@@ -106,7 +106,7 @@ def generate_database_url(dbtype=None,username=None,password=None,host=None,tabl
     '''
     if not template:
         if not dbtype or not username or not password or not host or not table:
-            print "Please provide all inputs: dbtype,username,password,host,table."
+            print("Please provide all inputs: dbtype,username,password,host,table.")
         else:
             return "%s://%s:%s@%s/%s"  %(dbtype,
                                          username,

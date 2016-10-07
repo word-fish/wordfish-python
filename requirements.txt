@@ -6,3 +6,5 @@ flask
 gitpython
 gensim
 xmltodict
+pandas
+textblob
