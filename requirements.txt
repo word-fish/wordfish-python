@@ -5,5 +5,4 @@ smmap
 flask
 gitpython
 gensim
-graphlab-create
 xmltodict

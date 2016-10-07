@@ -89,6 +89,7 @@ def save_models(models,base_dir):
     for model_key,model in models.iteritems():
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
+
 def build_models(corpus,model_type="word2vec",remove_non_english_chars=True,remove_stop_words=True):
     models = dict()
     print "Training models..."
