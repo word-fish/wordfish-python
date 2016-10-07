@@ -21,7 +21,7 @@ memory = 64000
 
 
 if len(sys.argv) < 2:
-    print 'Please provide job file with list of single commands as input.'
+    print('Please provide job file with list of single commands as input.')
 
 else:
     jobfile = sys.argv[1]
