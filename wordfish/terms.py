@@ -20,7 +20,7 @@ def download_nltk():
     '''
     home=os.environ["HOME"]
     download_dir = "%s/nltk_data" %home
-    print "Downloading nltk to %s" %(download_dir)
+    print("Downloading nltk to %s" %(download_dir))
     if not os.path.exists(download_dir):
         import nltk
         nltk.download('all')
@@ -92,7 +92,7 @@ def save_terms(input_terms,output_dir=None):
             nodes.append(meta)
             ids.append(str(node).lower())
     else:
-        print "Invalid input_terms, must be str, dict, or list."
+        print("Invalid input_terms, must be str, dict, or list.")
         return
 
     result = {"nodes":nodes}
@@ -181,7 +181,7 @@ def get_relations(base_dir,tags=None,read=False):
     if tags == None:
         tags = [os.path.basename(x) for x in find_directories(relations_dir)]
     for tag in tags:
-        print "Finding relations for %s" %(tag)
+        print("Finding relations for %s" %(tag))
         relations_files = glob("%s/%s/*_relations.json" %(relations_dir,tag))
         if len(relations_files) != 0:
             if read:
@@ -198,13 +198,13 @@ def get_relations_df(base_dir,tags=None):
     if tags == None:
         tags = [os.path.basename(x) for x in find_directories(relations_dir)]
     for tag in tags:
-        print "Finding relations for %s" %(tag)
+        print("Finding relations for %s" %(tag))
         relations_files = glob("%s/%s/*_relations.json" %(relations_dir,tag))
         term_names = numpy.unique([x.split("_")[0] for x in relations_files]).tolist()
         edges = pandas.DataFrame(columns=term_names,index=term_names)
         for r in range(len(relations_files)):
             relation_file = relations_files[r]
-            print "Parsing %s of %s" %(r,len(relations_files))
+            print("Parsing %s of %s" %(r,len(relations_files)))
             term1,term2=os.path.basename(relation_file).split("_")[0:2]      
             edges.loc[term1,term2] = read_json(relation_file)["value"]
             edges.loc[term2,term1] = read_json(relation_file)["value"]
@@ -218,6 +218,6 @@ def read_relations(relations_list,search_expression=None):
     else:
         relations = []
         for x in range(len(relations_files)):
-            print "Parsing %s of %s" %(x,len(relations_files))  
+            print("Parsing %s of %s" %(x,len(relations_files)))
             relations.append(read_json(relations_files[x])) 
 
