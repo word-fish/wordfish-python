@@ -9,6 +9,7 @@ from wordfish.nlp import text2sentences, sentence2words, find_phrases
 from wordfish.utils import read_json
 
 from gensim.models import Word2Vec, Doc2Vec
+from gensim.models.doc2vec import LabeledSentence
 from glob import glob
 from numpy import average
 import numpy
@@ -33,22 +34,24 @@ class TrainSentences(object):
 
        self.files = text_files
        self.text_list = text_list
+       self.remove_non_english_chars = remove_non_english_chars
+       self.remove_stop_words = remove_stop_words
 
     def __iter__(self):
         if self.files != None:
             # Iterating over a list of file paths
             for input_file in self.files:
                 for text in file(input_file, "rb"):
-                    for line in text2sentences(text,remove_non_english_chars=remove_non_english_chars):            
-                        words = sentence2words(line,remove_stop_words=remove_stop_words)
+                    for line in text2sentences(text,remove_non_english_chars=self.remove_non_english_chars):            
+                        words = sentence2words(line,remove_stop_words=self.remove_stop_words)
                         if len(words) < 3: continue    
                         yield words
 
         else:
             # Iterating over a list of text
             for text in self.text_list:
-                for line in text2sentences(text,remove_non_english_chars=remove_non_english_chars):            
-                    words = sentence2words(line,remove_stop_words=remove_stop_words)
+                for line in text2sentences(text,remove_non_english_chars=self.remove_non_english_chars):            
+                    words = sentence2words(line,remove_stop_words=self.remove_stop_words)
                     if len(words) < 3: continue    
                     yield words
 
@@ -56,15 +59,18 @@ class TrainSentences(object):
 class LabeledLineSentence(object):
     '''LabeledLineSentence does equivalent preprocessing of documents, but then yields a labeled 
     sentence. The intention is for use with doc2vec'''
-
-    def __init__(self,doc_list,labels_list,remove_stop_words=True, remove_non_english_chars=True):
+    def __init__(self,labels_list,text_files=None,text_list=None,
+                remove_stop_words=True, remove_non_english_chars=True):
        self.labels_list = labels_list
-       self.doc_list = doc_list
-       self.words_list = TrainSentences(self.doc_list,remove_stop_words,remove_non_english_chars)
-
+       self.text_files = text_files
+       self.text_list = text_list
+       self.words_list = TrainSentences(text_files=self.text_files,
+                                       text_list=self.text_list,
+                                       remove_stop_words=remove_stop_words,
+                                       remove_non_english_chars=remove_non_english_chars)
     def __iter__(self):
         for idx, words in enumerate(self.words_list):
-            yield LabeledSentence(words=words,labels=[self.labels_list[idx]])
+            yield LabeledSentence(words=words,tags=[self.labels_list[idx]])
 
 
 def train_word2vec_model(text_files=None,text_list=None,remove_non_english_chars=True,remove_stop_words=True):
@@ -75,12 +81,23 @@ def train_word2vec_model(text_files=None,text_list=None,remove_non_english_chars
     model = Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
 
-def train_doc2vec_model(text_files,text_labels,remove_non_english_chars=False,remove_stop_words=True):
-    docs = LabeledLineSentence(doc_list = text_files,
+def train_doc2vec_model(text_labels,text_files=None,text_list=None,iters=10,
+                        remove_non_english_chars=False,remove_stop_words=True):
+    docs = LabeledLineSentence(text_files = text_files,
+                               text_list = text_list,
                                labels_list = text_labels,
                                remove_stop_words = remove_stop_words,
                                remove_non_english_chars = remove_non_english_chars)
-    
+    model = Doc2Vec(size=300,window=10,min_count=5,workers=11,alpha=0.025, min_alpha=0.025) # use fixed learning rate
+    model.build_vocab(docs)
+
+    for it in range(iters):
+        print("Training iteration %s" %(it))
+        model.train(docs)
+        model.alpha -= 0.002 # decrease the learning rate
+        model.min_alpha = model.alpha # fix the learning rate, no decay
+        model.train(labeledDocs)
+    return model
 
 # Classification ###############################################################
 
