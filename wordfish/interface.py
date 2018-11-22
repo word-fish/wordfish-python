@@ -1,4 +1,32 @@
-from wordfish.vm import generate_database_url, custom_app_download, generate_app
+'''
+
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+'''
+
+from wordfish.vm import (
+    generate_database_url, 
+    custom_app_download, 
+    generate_app
+)
 from wordfish.plugin import get_plugins, get_corpus, get_terms
 from flask import Flask, render_template, request, send_file
 from wordfish.utils import copy_directory, make_zip
@@ -36,8 +64,7 @@ Main function for starting interface to generate an application
 # Step 0: User is presented with base interface
 @app.route('/')
 def start():
-    #TODO: we could define custom analysis object here 
-
+    #TODO: we could define custom analysis object here
     return render_template('index.html')
 
 # STEP 1: Validation of user input for app
@@ -46,7 +73,7 @@ def validate():
     logo = None
     if request.method == 'POST':
         fields = dict()
-        for field,value in request.form.iteritems():
+        for field,value in request.form.items():
             fields[field] = value
              
         # Prepare temp folder with cloned wordfish-python and wordfish-plugins
@@ -70,7 +97,7 @@ def validate():
 def select():
     if request.method == 'POST':
         fields = dict()
-        for field,value in request.form.iteritems():
+        for field,value in request.form.items():
             fields[field] = value
 
         # Retrieve experiment folders 

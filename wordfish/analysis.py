@@ -3,6 +3,26 @@ analysis.py
 
 part of the wordfish python package: extracting relationships of terms from corpus
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
 
 from wordfish.nlp import text2sentences, sentence2words, find_phrases
@@ -148,7 +168,7 @@ def save_models(models,base_dir):
     '''
     save_models: should be a dictionary with tags as keys, models as value
     '''
-    for model_key,model in models.iteritems():
+    for model_key,model in models.items():
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
 
@@ -163,7 +183,7 @@ def build_models(corpus,model_type="word2vec",remove_non_english_chars=True,
     '''
     models = dict()
     print("Training models...")
-    for corpus_id,sentences in corpus.iteritems():
+    for corpus_id,sentences in corpus.items():
         try:
             if model_type == "word2vec":
                 if file_paths == True:
@@ -210,7 +230,7 @@ def load_models(base_dir,model_keys=None):
 
 def export_vectors(models,output_dir,sep="\t"):
     # Export vectors
-    for model_name,model in models.iteritems():
+    for model_name,model in models.items():
         print("Processing %s" %(model_name))
         vecs = extract_vectors(model)
         vecs.to_csv("%s/%s.tsv" %(output_dir,model_name),sep=sep)
@@ -254,7 +274,7 @@ def export_models_tsv(models,base_dir,vocabs=None):
             print("There must be a vocab specified for each model.")
             return
     count=0
-    for tag,model in models.iteritems():
+    for tag,model in models.items():
         if vocabs==None:
             export_model_tsv(model,tag,base_dir,vocabs)
         else:
@@ -288,7 +308,7 @@ def vocab_term_intersect(terms,model):
     '''
     vocab = model.vocab.keys()
     intersects = dict()
-    for tag,term_set in terms.iteritems():
+    for tag,term_set in terms.items():
         if isinstance(term_set,dict):
             names = [x["name"] for x in term_set["nodes"].values()] 
             phrases = find_phrases(words=names,vocabulary=vocab)

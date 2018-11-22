@@ -126,7 +126,7 @@
     <script>
     $(document).ready(function() {
       {% if fields is defined %}
-        {% for field,value in fields.iteritems() %}
+        {% for field,value in fields.items() %}
             $("#{{ field }}").val("{{ value }}");
         {% endfor %}
       {% endif %}

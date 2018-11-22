@@ -4,17 +4,39 @@ plugin.py
 part of the wordfish python package: extracting relationships of terms from corpus
 this set of functions finds and validates plugins for inclusion in the package
 
-TODO: These functions will be written when it is time to create the web app portion of this.
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 '''
-from wordfish.utils import find_directories, remove_unicode_dict, copy_directory, add_lines, wordfish_home
+from wordfish.utils import ( 
+    find_directories, 
+    remove_unicode_dict, 
+    copy_directory, 
+    add_lines, 
+    wordfish_home
+)
 from glob import glob
 import inspect
 import json
 import os
-import nltk
-import numpy
-import pandas
+import math
 
 def get_validation_fields():
     """
@@ -89,7 +111,7 @@ def get_corpus(plugins,return_field=None):
     corpus = filter_by_field(plugins,"corpus","True")
     if return_field != None:
         corpus = [x[0][return_field] for x in corpus]
-        corpus = numpy.unique(corpus).tolist()
+        corpus = list(set(corpus))
     return corpus
     
 def filter_by_field(plugins,field,field_value):
@@ -114,7 +136,7 @@ def get_terms(plugins,return_field=None):
     terms = filter_by_field(plugins,"terms","True")
     if return_field != None:
         terms = [x[0][return_field] for x in terms]
-        terms = numpy.unique(terms).tolist()
+        terms = list(set(terms))
     return terms
 
 
@@ -240,14 +262,14 @@ def generate_job(func,category,inputs=None,batch_num=1):
         else:
             formatted_inputs = ""
             # First collect all string args - this means same for all scripts
-            for varname,elements in inputs.iteritems():
+            for varname,elements in inputs.items():
                 if isinstance(elements,str):
                     single_input = format_single_input(varname,elements)
                     formatted_inputs = "%s%s" %(formatted_inputs,single_input)
                           
             # Now collect lists, must be equal length
             input_lists = dict()
-            for varname,elements in inputs.iteritems():
+            for varname,elements in inputs.items():
                 if isinstance(elements,list):
                     if len(input_lists)>0:
                         if len(input_lists.values()[0]) == len(elements):    
@@ -261,7 +283,7 @@ def generate_job(func,category,inputs=None,batch_num=1):
                 lines_to_add.append("python -c 'from %s import %s; %s(%s,%s)'" %(script,func,func,output_dir,formatted_inputs))
             else:
                 N = len(input_lists.values()[0])
-                iters = int(numpy.ceil(N/float(batch_num)))
+                iters = int(math.ceil(N/float(batch_num)))
                 start = 0
                 for i in range(1,iters+1):
                     formatted_instance = formatted_inputs
@@ -269,7 +291,7 @@ def generate_job(func,category,inputs=None,batch_num=1):
                         end = N
                     else:
                         end = i*batch_num
-                    for varname,elements in input_lists.iteritems():
+                    for varname,elements in input_lists.items():
                         new_input = format_inputs(varname,elements[start:end])
                         formatted_instance = "%s%s" %(formatted_instance,new_input)
                     start = end
@@ -287,4 +309,4 @@ def format_single_input(varname,element):
 
 def format_inputs(varname,elements):
     elements = ['"%s"' %(x) if isinstance(x,str) else x for x in elements]
-    return " %s=[%s]" %(varname,",".join([str(x) for x in elements])) 
+    return " %s=[%s]" %(varname,",".join([str(x) for x in elements]))

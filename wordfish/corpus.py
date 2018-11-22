@@ -5,9 +5,29 @@ part of the wordfish python package: extracting relationships of terms from corp
 this set of functions works with different plugins (in plugins folder) to produce input corpus
 for parsing.
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
 
-from wordfish.utils import find_directories, save_pretty_json
+from wordfish.utils import ( find_directories, save_pretty_json )
 from wordfish.nlp import remove_nonenglish_chars
 from textblob import TextBlob
 from glob import glob
@@ -28,7 +48,7 @@ def save_sentences(articles,output_dir=".",prefix=""):
         eg $WORK/corpus/neurosynth
     '''
     if isinstance(articles,dict):
-        for uid, meta in articles.iteritems():
+        for uid, meta in articles.items():
             meta["text"] = remove_nonenglish_chars(meta["text"])
             save_sentences_single(uid,meta["text"],output_dir,prefix)
             # If more than one entry is provided, we also have meta data
@@ -40,7 +60,8 @@ def save_sentences(articles,output_dir=".",prefix=""):
             articles["uid"] = remove_nonenglish_chars(articles["uid"])
             save_sentences_single(uid,articles[uid],output_dir,prefix)
 
-def save_sentences_single(uid,text,output_dir,remove_non_english_chars=True,prefix=""):
+
+def save_sentences_single(uid, text, output_dir, remove_non_english_chars=True, prefix=""):
     '''save_sentence_single
     Write text to file 
     Parameters
@@ -114,6 +135,3 @@ def subset_corpus(corpus,delim="_",position=0):
         else:
             subset[topic] = [document]
     return subset
-
-
-

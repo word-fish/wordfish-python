@@ -6,7 +6,28 @@ part of the wordfish python package: extracting relations between terms from cor
 this set of functions works with different plugins (in plugins folder) to produce input terminologies
 to search for in corpus
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
+
 from wordfish.utils import save_pretty_json, find_directories, read_json
 from uuid import uuid4
 from glob import glob
@@ -29,17 +50,19 @@ def download_nltk():
 
 def save_relations(relations,output_dir=None):
     '''save_relationships
-    Parameters
-    =========
-     output_dir: path
-        path to save output. If none, will just return json dictionary
-    relations: list of tuples [(source,target,relation)]
-        if defined, all keys must be in input_terms. Not yet decided what a "relation" should be, but for now assume you can have it be a string or number.
-    Returns
-    =======
-         list of links
-         [{"source":"node1","target":"node2","value":0.5}]
 
+       Parameters
+       =========
+       output_dir: path
+       path to save output. If none, will just return json dictionary
+       relations: list of tuples [(source,target,relation)]
+       if defined, all keys must be in input_terms. Not yet decided what a 
+       "relation" should be, but for now assume you can have it be a string or number.
+   
+       Returns
+       =======
+       list of links
+       [{"source":"node1","target":"node2","value":0.5}]
     '''
     # Not sure why anyone would do this, but might as well check
     links = []
@@ -87,7 +110,7 @@ def save_terms(input_terms,output_dir=None):
             nodes.append({"name":term.lower(),"uid":str(t)})
             ids.append(term.lower())
     elif isinstance(input_terms,dict):
-        for node, meta in input_terms.iteritems():
+        for node, meta in input_terms.items():
             meta["uid"] = str(node).lower()
             nodes.append(meta)
             ids.append(str(node).lower())
@@ -200,7 +223,7 @@ def get_relations_df(base_dir,tags=None):
     for tag in tags:
         print("Finding relations for %s" %(tag))
         relations_files = glob("%s/%s/*_relations.json" %(relations_dir,tag))
-        term_names = numpy.unique([x.split("_")[0] for x in relations_files]).tolist()
+        term_names = list(set([x.split("_")[0] for x in relations_files]))
         edges = pandas.DataFrame(columns=term_names,index=term_names)
         for r in range(len(relations_files)):
             relation_file = relations_files[r]
