@@ -25,7 +25,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 '''
 
-from wordfish.nlp import text2sentences, sentence2words, find_phrases
+from wordfish.nlp import (
+    text2sentences, 
+    sentence2words, 
+    find_phrases
+)
 from wordfish.utils import read_json
 
 from gensim.models import Word2Vec, Doc2Vec
@@ -40,16 +44,36 @@ import sys
 # Training ######################################################################
 
 class TrainSentences(object):
-    '''TrainSentences will produce an iterator of sentences for training. The intended use is
-    for building a word2vec model, as the sentences are revealed as sets of words.'''
+    ''' 
+        TrainSentences will produce an iterator of sentences for training. 
+        The intended use is for building a word2vec model, as the sentences 
+        are revealed as sets of words (or the pieces that are presented 
+        in the file
+    '''
 
-    def __init__(self,text_files=None,text_list=None,remove_stop_words=True,remove_non_english_chars=True):
-       '''either text_files (a list of files) or file_list) a list of strings, each the text from a doc)
-       must be defined. text_files takes preference over file_list'''
+    def __str__(self):
+        if self.files != None:
+            return '%s files' %len(self.files)
+        elif self.text_list != None:
+            return '%s texts' %len(self.text_list)
+        return "TrainSentence"
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __init__(self, text_files=None,
+                       text_list=None, 
+                       remove_stop_words=True,
+                       remove_non_english_chars=True):
+
+       ''' either text_files (a list of files) or file_list) a list of strings,
+           each the text from a doc) must be defined. 
+           text_files takes preference over file_list '''
 
        # The user must provide one of either inputs
        if text_files == None and text_list == None:
-           print("Please define either text_files (a list of file paths) or file_list (a list of strings)")
+           print('''Please define either text_files (a list of file paths) 
+                    or file_list (a list of strings)''')
            sys.exit(1)
 
        self.files = text_files
@@ -58,21 +82,22 @@ class TrainSentences(object):
        self.remove_stop_words = remove_stop_words
 
     def __iter__(self):
+
         if self.files != None:
+
             # Iterating over a list of file paths
             for input_file in self.files:
-                for text in file(input_file, "rb"):
-                    for line in text2sentences(text,remove_non_english_chars=self.remove_non_english_chars):            
-                        words = sentence2words(line,remove_stop_words=self.remove_stop_words)
-                        if len(words) < 3: continue    
+                for text in open(input_file, "r").readlines():
+                    for line in text2sentences(text, remove_non_english_chars=self.remove_non_english_chars):            
+                        words = sentence2words(line, remove_stop_words=self.remove_stop_words)
                         yield words
 
         else:
+
             # Iterating over a list of text
             for text in self.text_list:
                 for line in text2sentences(text,remove_non_english_chars=self.remove_non_english_chars):            
                     words = sentence2words(line,remove_stop_words=self.remove_stop_words)
-                    if len(words) < 3: continue    
                     yield words
 
 
@@ -93,7 +118,12 @@ class LabeledLineSentence(object):
             yield LabeledSentence(words=words,tags=[self.labels_list[idx]])
 
 
-def train_word2vec_model(text_files=None,text_list=None,remove_non_english_chars=True,remove_stop_words=True):
+def train_word2vec_model(text_files=None,
+                         text_list=None, 
+                         remove_non_english_chars=True,
+                         remove_stop_words=True):
+    '''train_word2vec_model is a wrapper for TrainSentences, endsuring that we use
+       gensim's word2vec with TrainingSentences derived from some corpus'''
     sentences = TrainSentences(text_files=text_files,
                                text_list=text_list,
                                remove_stop_words=remove_stop_words,
@@ -101,14 +131,29 @@ def train_word2vec_model(text_files=None,text_list=None,remove_non_english_chars
     model = Word2Vec(sentences, size=300, workers=8, min_count=40)
     return model
 
-def train_doc2vec_model(text_labels,text_files=None,text_list=None,iters=10,
-                        remove_non_english_chars=False,remove_stop_words=True):
+def train_doc2vec_model(text_labels,
+                        text_files=None,
+                        text_list=None,
+                        iters=10,
+                        remove_non_english_chars=True,
+                        remove_stop_words=True):
+    '''train_doc2vec_model will let us input a file with a corresponding label
+       (intended to be associated with a document). It is a wrapped for 
+       LabeledLineSentence.'''
+
     docs = LabeledLineSentence(text_files = text_files,
                                text_list = text_list,
                                labels_list = text_labels,
                                remove_stop_words = remove_stop_words,
                                remove_non_english_chars = remove_non_english_chars)
-    model = Doc2Vec(size=300,window=10,min_count=5,workers=11,alpha=0.025, min_alpha=0.025) # use fixed learning rate
+
+    model = Doc2Vec(size=300, 
+                    window=10,
+                    min_count=5,
+                    workers=11,
+                    alpha=0.025, 
+                    min_alpha=0.025) # use fixed learning rate
+
     model.build_vocab(docs)
 
     for it in range(iters):
@@ -164,7 +209,7 @@ class DeepTextAnalyzer(object):
         return avg_vector
 
 
-def save_models(models,base_dir):
+def save_models(models, base_dir):
     '''
     save_models: should be a dictionary with tags as keys, models as value
     '''
@@ -172,46 +217,47 @@ def save_models(models,base_dir):
         model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
 
 
-def build_models(corpus,model_type="word2vec",remove_non_english_chars=True,
-                 remove_stop_words=True,file_paths=True):
-    '''build_models will build a model_type from either file_paths (when file_paths=True) or 
-    from a list of text already loaded (when file_paths == False)
-    :param corpus: the dictionary of corpus_id and sentences (or file with sentences)
-    :param model_type: either word2vec or doc2vec
-    :param remove_non_english_chars (self explanatory) default is True
-    :param remove_stop_words: (self explanatory) default is True
+def build_models(corpus, 
+                 model_type="word2vec",
+                 remove_non_english_chars=True,
+                 remove_stop_words=True,
+                 file_paths=True):
+
+    '''build_models will build a model_type from either file_paths (when 
+       file_paths=True) or from a list of text already loaded 
+       (when file_paths == False)
+    
+        Parameters
+        ==========
+        corpus: the dictionary of corpus_id and sentences (or file with sentences)
+        model_type: either word2vec or doc2vec
+        remove_non_english_chars (self explanatory) default is True
+        remove_stop_words: (self explanatory) default is True
     '''
     models = dict()
     print("Training models...")
-    for corpus_id,sentences in corpus.items():
-        try:
-            if model_type == "word2vec":
-                if file_paths == True:
-                    models[corpus_id] = train_word2vec_model(text_files=sentences,
-                                                             remove_non_english_chars=remove_non_english_chars,
-                                                             remove_stop_words=remove_stop_words)
-                else:
-                    models[corpus_id] = train_word2vec_model(text_list=sentences,
-                                                             remove_non_english_chars=remove_non_english_chars,
-                                                             remove_stop_words=remove_stop_words)
+    for corpus_id, sentences in corpus.items():
 
-            elif model_type == "doc2vec":
-                if file_paths == True:
-                    models[corpus_id] = train_doc2vec_model(text_files=sentences,
-                                                            remove_non_english_chars=remove_non_english_chars,
-                                                            remove_stop_words=remove_stop_words)
-                else:
-                    models[corpus_id] = train_doc2vec_model(text_list=sentences,
-                                                            remove_non_english_chars=remove_non_english_chars,
-                                                            remove_stop_words=remove_stop_words)
+        # Default training function
+        trainFunc = train_word2vec_model
 
-            else:
-                print("Currently supported model_type are word2vec and doc2vec.")
-                sys.exit(1)
+        # Right now only support word2vec, doc2vec
+        if model_type not in ['doc2vec', 'word2vec']:
+            print("Currently supported model_type are word2vec and doc2vec.")
+            sys.exit(1)
 
-        except:
-            print("Error building model for %s" %(corpus_id))
-            pass
+        if model_type == "doc2vec":
+            trainFunc = train_doc2vec_model
+
+        if file_paths is True:
+            models[corpus_id] = trainFunc(text_files=sentences,
+                                          remove_non_english_chars=remove_non_english_chars,
+                                          remove_stop_words=remove_stop_words)
+
+        else:
+            models[corpus_id] = trainFunc(text_list=sentences,
+                                          remove_non_english_chars=remove_non_english_chars,
+                                          remove_stop_words=remove_stop_words)
     return models
 
 
