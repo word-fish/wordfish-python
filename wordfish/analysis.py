@@ -33,7 +33,7 @@ from wordfish.nlp import (
 from wordfish.utils import read_json
 
 from gensim.models import Word2Vec, Doc2Vec
-from gensim.models.doc2vec import LabeledSentence
+from gensim.models.doc2vec import TaggedDocument
 from glob import glob
 from numpy import average
 import numpy
@@ -50,16 +50,6 @@ class TrainSentences(object):
         are revealed as sets of words (or the pieces that are presented 
         in the file
     '''
-
-    def __str__(self):
-        if self.files != None:
-            return '%s files' %len(self.files)
-        elif self.text_list != None:
-            return '%s texts' %len(self.text_list)
-        return "TrainSentence"
-
-    def __repr__(self):
-        return self.__str__()
 
     def __init__(self, text_files=None,
                        text_list=None, 
@@ -81,6 +71,16 @@ class TrainSentences(object):
        self.remove_non_english_chars = remove_non_english_chars
        self.remove_stop_words = remove_stop_words
 
+    def __str__(self):
+        if self.files != None:
+            return '%s files' %len(self.files)
+        elif self.text_list != None:
+            return '%s texts' %len(self.text_list)
+        return "TrainSentence"
+
+    def __repr__(self):
+        return self.__str__()
+
     def __iter__(self):
 
         if self.files != None:
@@ -96,65 +96,85 @@ class TrainSentences(object):
 
             # Iterating over a list of text
             for text in self.text_list:
-                for line in text2sentences(text,remove_non_english_chars=self.remove_non_english_chars):            
-                    words = sentence2words(line,remove_stop_words=self.remove_stop_words)
+                for line in text2sentences(text, remove_non_english_chars=self.remove_non_english_chars):            
+                    words = sentence2words(line, remove_stop_words=self.remove_stop_words)
                     yield words
 
 
 class LabeledLineSentence(object):
     '''LabeledLineSentence does equivalent preprocessing of documents, but then yields a labeled 
     sentence. The intention is for use with doc2vec'''
-    def __init__(self,labels_list,text_files=None,text_list=None,
-                remove_stop_words=True, remove_non_english_chars=True):
+    def __init__(self,
+                labels_list,
+                text_files=None,
+                remove_stop_words=True, 
+                remove_non_english_chars=True):
+
        self.labels_list = labels_list
        self.text_files = text_files
-       self.text_list = text_list
-       self.words_list = TrainSentences(text_files=self.text_files,
-                                       text_list=self.text_list,
-                                       remove_stop_words=remove_stop_words,
-                                       remove_non_english_chars=remove_non_english_chars)
+       self.remove_stop_words = remove_stop_words
+       self.remove_non_english_chars = remove_non_english_chars
+
+    def __str__(self):
+        if self.files != None:
+            return '%s files' %len(self.text_files)
+        return "LabeledLineSentence"
+
+    def __repr__(self):
+        return self.__str__()
+
     def __iter__(self):
-        for idx, words in enumerate(self.words_list):
-            yield LabeledSentence(words=words,tags=[self.labels_list[idx]])
+        labels = self.labels_list.copy()
+        for text_file in self.text_files:
+            label = labels.pop(0)
+            words_list = TrainSentences(text_files=[text_file],
+                                        remove_stop_words=self.remove_stop_words,
+                                        remove_non_english_chars=self.remove_non_english_chars)
+            for text in words_list:
+                yield TaggedDocument(words=text, tags=[label])
 
 
 def train_word2vec_model(text_files=None,
                          text_list=None, 
                          remove_non_english_chars=True,
-                         remove_stop_words=True):
+                         remove_stop_words=True,
+                         min_count=1,
+                         workers=8,
+                         size=300):
+
     '''train_word2vec_model is a wrapper for TrainSentences, endsuring that we use
        gensim's word2vec with TrainingSentences derived from some corpus'''
+
     sentences = TrainSentences(text_files=text_files,
                                text_list=text_list,
                                remove_stop_words=remove_stop_words,
                                remove_non_english_chars=remove_non_english_chars)
-    model = Word2Vec(sentences, size=300, workers=8, min_count=40)
-    return model
+    return Word2Vec(sentences, size=size, workers=workers, min_count=min_count)
+
 
 def train_doc2vec_model(text_labels,
                         text_files=None,
-                        text_list=None,
                         iters=10,
                         remove_non_english_chars=True,
-                        remove_stop_words=True):
+                        remove_stop_words=True,
+                        size=300, min_count=1, workers=8, 
+                        alpha=0.025, min_alpha=0.025):
     '''train_doc2vec_model will let us input a file with a corresponding label
        (intended to be associated with a document). It is a wrapped for 
        LabeledLineSentence.'''
 
-    docs = LabeledLineSentence(text_files = text_files,
-                               text_list = text_list,
-                               labels_list = text_labels,
-                               remove_stop_words = remove_stop_words,
-                               remove_non_english_chars = remove_non_english_chars)
+    lls = LabeledLineSentence(text_files=text_files,
+                              labels_list=text_labels,
+                              remove_stop_words=remove_stop_words,
+                              remove_non_english_chars=remove_non_english_chars)
 
-    model = Doc2Vec(size=300, 
+    model = Doc2Vec(lls,
+                    vector_size=size, 
                     window=10,
-                    min_count=5,
-                    workers=11,
-                    alpha=0.025, 
-                    min_alpha=0.025) # use fixed learning rate
-
-    model.build_vocab(docs)
+                    min_count=min_count,
+                    workers=workers,
+                    alpha=alpha, 
+                    min_alpha=min_alpha) # use fixed learning rate
 
     for it in range(iters):
         print("Training iteration %s" %(it))
@@ -167,6 +187,7 @@ def train_doc2vec_model(text_labels,
 # Classification ###############################################################
 
 class DeepTextAnalyzer(object):
+
     def __init__(self, word2vec_model):
         # https://dato.com/learn/gallery/notebooks/deep_text_learning.html
         """
@@ -174,6 +195,7 @@ class DeepTextAnalyzer(object):
         :param word2vec_model: a trained Word2Vec model
         """
         self.model = word2vec_model
+
     def text2vectors(self,text):
         """
         Convert input text into an iterator that returns the corresponding vector representation of each
@@ -187,6 +209,7 @@ class DeepTextAnalyzer(object):
         if len(words) != 0:
             for w in words:
                 yield self.model[w]
+
     def text2mean_vector(self,text,read_file=True):
         """
         Calculate the average vector representation of the input text
@@ -209,56 +232,12 @@ class DeepTextAnalyzer(object):
         return avg_vector
 
 
-def save_models(models, base_dir):
+def save_models(models, output_dir, ext='word2vec'):
     '''
     save_models: should be a dictionary with tags as keys, models as value
     '''
     for model_key,model in models.items():
-        model.save("%s/analysis/models/%s.word2vec" %(base_dir,model_key))
-
-
-def build_models(corpus, 
-                 model_type="word2vec",
-                 remove_non_english_chars=True,
-                 remove_stop_words=True,
-                 file_paths=True):
-
-    '''build_models will build a model_type from either file_paths (when 
-       file_paths=True) or from a list of text already loaded 
-       (when file_paths == False)
-    
-        Parameters
-        ==========
-        corpus: the dictionary of corpus_id and sentences (or file with sentences)
-        model_type: either word2vec or doc2vec
-        remove_non_english_chars (self explanatory) default is True
-        remove_stop_words: (self explanatory) default is True
-    '''
-    models = dict()
-    print("Training models...")
-    for corpus_id, sentences in corpus.items():
-
-        # Default training function
-        trainFunc = train_word2vec_model
-
-        # Right now only support word2vec, doc2vec
-        if model_type not in ['doc2vec', 'word2vec']:
-            print("Currently supported model_type are word2vec and doc2vec.")
-            sys.exit(1)
-
-        if model_type == "doc2vec":
-            trainFunc = train_doc2vec_model
-
-        if file_paths is True:
-            models[corpus_id] = trainFunc(text_files=sentences,
-                                          remove_non_english_chars=remove_non_english_chars,
-                                          remove_stop_words=remove_stop_words)
-
-        else:
-            models[corpus_id] = trainFunc(text_list=sentences,
-                                          remove_non_english_chars=remove_non_english_chars,
-                                          remove_stop_words=remove_stop_words)
-    return models
+        model.save("%s/%s.%s" %(output_dir, model_key, ext))
 
 
 def load_models(base_dir,model_keys=None):
@@ -274,72 +253,37 @@ def load_models(base_dir,model_keys=None):
             models[model_key] = Word2Vec.load(model_file)
     return models
 
-def export_vectors(models,output_dir,sep="\t"):
-    # Export vectors
+def export_vectors(models, output_dir, sep="\t"):
     for model_name,model in models.items():
         print("Processing %s" %(model_name))
-        vecs = extract_vectors(model)
-        vecs.to_csv("%s/%s.tsv" %(output_dir,model_name),sep=sep)
+        vectors = extract_vectors(model)
+        output_tsv = "%s/%s.tsv" %(output_dir, model_name)
+        vectors.to_csv(output_tsv,sep=sep)
 
 
-def extract_vectors(model,vocab=None):
-    if vocab==None:
-        vocab = model.vocab.keys()
-    length = len(model.__getitem__(vocab[0]))
-    vectors = pandas.DataFrame(columns=range(length))
+def extract_vectors(model, vocab=None):
+    if vocab == None:
+        vocab = model.wv.vocab
+    vectors = pandas.DataFrame(columns=range(model.vector_size))
     for v in vocab:
-        vectors.loc[v] = model.__getitem__(v)
+        vectors.loc[v] = model.wv[v]
     return vectors
 
 # This is very slow - likely we can extract matrix from model itself
-def extract_similarity_matrix(model,vocab=None):
+def extract_similarity_matrix(model, vocab=None):
     if vocab==None:
-        vocab = model.vocab.keys()
-    nvocab = len(model.vocab.keys())
+        vocab = model.wv.vocab
     simmat = pandas.DataFrame(columns=vocab)
-    for v in range(len(vocab)):
-        term = vocab[v]
-        print("parsing %s of %s: %s" %(v,len(vocab),term))
-        sims = model.most_similar(term,topn=nvocab)
+    terms = list(vocab.keys())
+    for term, v in vocab.items():
+        print("parsing %s" %(term))
+        sims = model.most_similar(term,topn=len(terms))
         values = [sims[x][1] for x in range(len(sims)) if sims[x][0] in vocab]
         labels = [sims[x][0] for x in range(len(sims)) if sims[x][0] in vocab]
-        simmat.loc[v+1,labels] = values
+        simmat.loc[term, labels] = values
     return simmat
 
-def export_models_tsv(models,base_dir,vocabs=None):
-    '''
-    export_models_tsv: 
-    models: dict
-        should be a dictionary with tags as keys, models as value
-    vocabs: list
-        the vocabulary to extract from each model, must be
-        same length as model
-    '''
-    if vocabs != None:
-        if len(vocabs)!=len(models):
-            print("There must be a vocab specified for each model.")
-            return
-    count=0
-    for tag,model in models.items():
-        if vocabs==None:
-            export_model_tsv(model,tag,base_dir,vocabs)
-        else:
-            export_model_tsv(model,tag,base_dir,vocabs[count])
-            count+=1
-            
-
-def export_model_tsv(model,tag,base_dir,vocab=None):
-    '''
-    export_model_tsv: 
-    model: gensim.Word2Vec object
-    tag: tag corresponding to model name (corpus)
-    '''
-    df = extract_similarity_matrix(model,vocab=vocab)
-    df.to_csv("%s/analysis/models/%s.tsv" %(base_dir,tag),sep="\t")
-    return df
-
-
-def vocab_term_intersect(terms,model):
+def vocab_term_intersect(terms, model):
     '''
     Finds the intersection of a terms data structure and model.
     Uses a stemming method to stem both, and find overlap.
@@ -372,13 +316,15 @@ def get_labels(meta):
     return labels
 
 
-def featurize_to_corpus(model,meta,size=300,fillna=True):
+def featurize_to_corpus(model, meta, fillna=True):
     '''featurize_to_corpus
+
+    ## STOPPED HERE. Need to update this to not install on server, etc.
     generate average feature vectors for a set of documents and their labels based
     on an existing model (model). The meta json file should describe text and labels
     '''   
     analyzer = DeepTextAnalyzer(model)
-    vectors = pandas.DataFrame(columns=range(size))
+    vectors = pandas.DataFrame(columns=range(model.vector_size))
     # Get all unique term names from the meta objects
     term_names = get_labels(meta=meta)
     # Create a matrix of labels, keep track of which abstracts are labeled

@@ -35,8 +35,19 @@ import os
 import re
 import pickle
 
-def wordfish_home():
-    return os.environ["WORDFISH_HOME"]
+
+def download_nltk():
+    '''download_nltk
+       download nltk to home. If it already exists, just return the directory
+    '''
+    home = os.environ["HOME"]
+    download_dir = os.path.abspath(home, 'nltk_data')
+    if not os.path.exists(download_dir):
+        print("Downloading nltk to %s" %(download_dir))
+        import nltk
+        nltk.download('all')
+    return "%s/nltk_data" %(home)
+
 
 def save_pretty_json(dict_obj,output_file):
     with open(output_file, 'w') as outfile:

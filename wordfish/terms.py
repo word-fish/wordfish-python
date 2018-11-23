@@ -35,18 +35,22 @@ import pandas
 import nltk
 import os
 
-def download_nltk():
-    '''download_nltk
-    download nltk to home
-    '''
-    home=os.environ["HOME"]
-    download_dir = "%s/nltk_data" %home
-    print("Downloading nltk to %s" %(download_dir))
-    if not os.path.exists(download_dir):
-        import nltk
-        nltk.download('all')
-    return "%s/nltk_data" %(home)
 
+def has_nltk():
+    '''download_nltk
+       download nltk to home. If it already exists, just return the directory
+    '''
+    home = os.environ["HOME"]
+    download_dir = os.path.abspath(home, 'nltk_data')
+    return os.path.exists(download_dir)
+
+def check_nltk():
+    if not has_nltk:
+        print('''Please download nltk corpus before continuing:
+                 from wordfish.utils import download_nltk; download_nltk()
+                 import nltk; nltk.download('all')''')
+
+check_nltk()
 
 def save_relations(relations,output_dir=None):
     '''save_relationships

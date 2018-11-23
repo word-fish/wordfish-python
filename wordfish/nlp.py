@@ -33,13 +33,13 @@ import pandas
 import gensim
 import re
 
+# Ensure has downloaded data
+check_nltk()
 
 def remove_nonenglish_chars(text):
     return re.sub("[^a-zA-Z]", " ", text)
 
-
-    
-def text2sentences(text,remove_non_english_chars=True):
+def text2sentences(text, remove_non_english_chars=True):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')    
     if remove_non_english_chars:
         text = remove_nonenglish_chars(text)
@@ -47,9 +47,14 @@ def text2sentences(text,remove_non_english_chars=True):
         yield s
 
 
-
 def processText(text):
-    '''combines text2sentences and sentence2words'''
+    '''combines text2sentences and sentence2words
+
+       Parameters
+       ==========
+       text: the raw string of text to process
+    '''
+
     vector = []
     for line in text2sentences(text):            
         words = sentence2words(line)
@@ -59,11 +64,17 @@ def processText(text):
 
 
 def sentence2words(sentence,remove_stop_words=True,lower=True):
-    if isinstance(sentence,list): sentence = sentence[0]
+    if isinstance(sentence, list, tuple): 
+        sentence = sentence[0]
     re_white_space = re.compile("\s+")
     stop_words = set(stopwords.words("english"))
-    if lower: sentence = sentence.lower()
+
+    # The user wants to make all letters lowercase
+    if lower: 
+        sentence = sentence.lower()
     words = re_white_space.split(sentence.strip())
+
+    # Remove stop words
     if remove_stop_words:
         words = [w for w in words if w not in stop_words]
     return words

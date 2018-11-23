@@ -1,3 +1,4 @@
 recursive-include wordfish/templates *
 recursive-include wordfish/static *
 recursive-include wordfish/plugins *
+global-ignore OLD
