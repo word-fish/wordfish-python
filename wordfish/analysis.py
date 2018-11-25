@@ -91,6 +91,15 @@ class TrainSentences(TrainBase):
         The intended use is for building a word2vec model, as the sentences 
         are revealed as sets of words (or the pieces that are presented 
         in the file
+
+        Example::
+
+        sentences = TrainSentences(text_files=text_files,
+                                   text_list=text_list,
+                                   remove_stop_words=remove_stop_words,
+                                   remove_non_english_chars=remove_non_english_chars)
+        model = Word2Vec(sentences, size=300, workers=8, min_count=1)
+
     '''
     def __init__(self, text_files=None,
                        text_list=None, 
@@ -191,56 +200,6 @@ class LabeledLineSentence(object):
             for text in words_list:
                 yield TaggedDocument(words=text, tags=[label])
 
-
-def train_word2vec_model(text_files=None,
-                         text_list=None, 
-                         remove_non_english_chars=True,
-                         remove_stop_words=True,
-                         min_count=1,
-                         workers=8,
-                         size=300):
-
-    '''train_word2vec_model is a wrapper for TrainSentences, endsuring that we use
-       gensim's word2vec with TrainingSentences derived from some corpus'''
-
-    sentences = TrainSentences(text_files=text_files,
-                               text_list=text_list,
-                               remove_stop_words=remove_stop_words,
-                               remove_non_english_chars=remove_non_english_chars)
-    return Word2Vec(sentences, size=size, workers=workers, min_count=min_count)
-
-
-def train_doc2vec_model(text_labels,
-                        text_files=None,
-                        iters=10,
-                        remove_non_english_chars=True,
-                        remove_stop_words=True,
-                        size=300, min_count=1, workers=8, 
-                        alpha=0.025, min_alpha=0.025):
-    '''train_doc2vec_model will let us input a file with a corresponding label
-       (intended to be associated with a document). It is a wrapped for 
-       LabeledLineSentence.'''
-
-    lls = LabeledLineSentence(text_files=text_files,
-                              labels_list=text_labels,
-                              remove_stop_words=remove_stop_words,
-                              remove_non_english_chars=remove_non_english_chars)
-
-    model = Doc2Vec(lls,
-                    vector_size=size, 
-                    window=10,
-                    min_count=min_count,
-                    workers=workers,
-                    alpha=alpha, 
-                    min_alpha=min_alpha) # use fixed learning rate
-
-    for it in range(iters):
-        print("Training iteration %s" %(it))
-        model.train(docs)
-        model.alpha -= 0.002 # decrease the learning rate
-        model.min_alpha = model.alpha # fix the learning rate, no decay
-        model.train(labeledDocs)
-    return model
 
 # Classification ###############################################################
 
