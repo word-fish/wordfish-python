@@ -151,7 +151,7 @@ def get_attribute(entry, name, default=[]):
        If not, return some default.'''
     try:
         if hasattr(entry, name):
-            return getattr(result, name)    
+            return getattr(entry, name)    
     except KeyError:
         pass
     return default
