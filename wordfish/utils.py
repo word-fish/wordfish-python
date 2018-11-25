@@ -212,7 +212,8 @@ def add_lines(script,lines_to_add):
     filey.writelines("\n".join(lines))
     filey.close()
 
-# INTERNET ################################################
+# INTERNET #####################################################################
+
 def get_url(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -225,8 +226,28 @@ def get_json(url):
     json_single = get_url(url)
     return json.loads(json_single.decode("utf-8"))
 
-def read_json(json_file):
-    return json.load(open(json_file,"rb"))
+
+
+def read_file(filename, mode="r"):
+    with open(filename,mode) as filey:
+        content = filey.read()
+    return content
+
+
+def write_file(filename, content, mode="w"):
+    with open(filename, mode) as filey:
+        if isinstance(content, list):
+            for item in content:
+                filey.writelines(content)
+        else:
+            filey.writelines(content)
+    return filename
+
+
+def read_json(json_file, mode='r'):
+    with open(json_file, mode) as filey:
+        content = json.load(filey)
+    return content
 
 def has_internet_connectivity():
     """has_internet_connectivity
