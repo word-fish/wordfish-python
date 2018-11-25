@@ -46,7 +46,7 @@ import sys
 
 class TrainBase(object):
     ''' 
-        TrainSentences will produce an iterator of sentences for training. 
+        TrainBase will produce an iterator of sentences for training. 
         The intended use is for building a word2vec model, as the sentences 
         are revealed as sets of words (or the pieces that are presented 
         in the file
