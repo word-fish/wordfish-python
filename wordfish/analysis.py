@@ -92,9 +92,14 @@ class TrainSentences(TrainBase):
         are revealed as sets of words (or the pieces that are presented 
         in the file
     '''
-    def __init__(self):
+    def __init__(self, text_files=None,
+                       text_list=None, 
+                       remove_stop_words=True,
+                       remove_non_english_chars=True):
         self.name = "TrainSentences"
-        super(TrainBase, self).__init__()
+        super(TrainSentences, self).__init__(text_files, text_list,
+                                             remove_stop_words,
+                                             remove_non_english_chars)
 
     def __repr__(self):
         return self.__str__()
@@ -125,9 +130,15 @@ class TrainEquations(TrainBase):
         character symbols. This will produce an iterator of "equation sentences"
         for training. 
     '''
-    def __init__(self):
+    def __init__(self, text_files=None,
+                       text_list=None, 
+                       remove_stop_words=True,
+                       remove_non_english_chars=True):
+
         self.name = "TrainEquations"
-        super(TrainEquations, self).__init__()
+        super(TrainEquations, self).__init__(text_files, text_list,
+                                             remove_stop_words,
+                                             remove_non_english_chars)
 
     def __repr__(self):
         return self.__str__()
@@ -141,7 +152,6 @@ class TrainEquations(TrainBase):
                 for text in open(input_file, "r").readlines():
                     for line in text2sentences(text, self.remove_non_english_chars):            
                         yield equation2tokens(line) 
-
         else:
             # Iterating over a list of text
             for text in self.text_list:
@@ -266,7 +276,7 @@ class DeepAnalyzerBase(object):
         count = 1.0
         for v in vectors:
             count += 1
-            vectors_sum = numpy.add(vectors_sum,v)
+            vectors_sum = numpy.add(vectors_sum, v)
 
         # calculate the average vector, replace +infy and -inf w/ numeric values 
         return numpy.nan_to_num(vectors_sum/count)

@@ -146,6 +146,16 @@ def get_template(template_file):
     filey.close()
     return template
 
+def get_attribute(entry, name, default=[]):
+    '''A helper to get an attribute from an object, if it exists.
+       If not, return some default.'''
+    try:
+        if hasattr(entry, name):
+            return getattr(result, name)    
+    except KeyError:
+        pass
+    return default
+
 """
 make a substitution for a template_tag in a template
 """

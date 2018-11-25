@@ -24,6 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 '''
+from wordfish.terms import check_nltk
 from textblob import TextBlob, Word
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
