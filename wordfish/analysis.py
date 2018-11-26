@@ -298,6 +298,27 @@ class DeepEquationAnalyzer(DeepAnalyzerBase):
                 yield self.model.wv.__getitem__(t)
 
 
+class DeepCharacterAnalyzer(DeepAnalyzerBase):
+
+    def __init__(self, model):
+        super(DeepCharacterAnalyzer, self).__init__(model)
+
+    def text2vectors(self, text):
+        '''Convert input string equation into an iterator that returns the 
+        corresponding vector representation of each word in the text, 
+        if it exists in the  Word2Vec model
+
+        Parameters
+        ==========
+        txt: input text
+        returns iterator of vectors, from txt using the Word2Vec model.
+        '''
+        chars = [c for c in text if self.model.wv.__contains__(c)]
+        if len(chars) > 0:
+            for c in chars:
+                yield self.model.wv.__getitem__(c)
+
+
 class DeepTextAnalyzer(DeepAnalyzerBase):
 
     def __init__(self, model):
