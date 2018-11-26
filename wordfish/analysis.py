@@ -168,6 +168,41 @@ class TrainEquations(TrainBase):
                     yield equation2tokens(line) 
 
 
+class TrainCharacters(TrainBase):
+    ''' 
+        Do Word2Vec, but use single characters instead of equations tokens. 
+    '''
+    def __init__(self, text_files=None,
+                       text_list=None, 
+                       remove_stop_words=True,
+                       remove_non_english_chars=True):
+
+        self.name = "TrainCharacters"
+        super(TrainCharacters, self).__init__(text_files, text_list,
+                                              remove_stop_words,
+                                              remove_non_english_chars)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __iter__(self):
+
+        if self.files != None:
+
+            # Iterating over a list of file paths
+            for input_file in self.files:
+                for text in open(input_file, "r").readlines():
+                    for line in text2sentences(text, self.remove_non_english_chars):            
+                        for c in line:
+                            yield c 
+        else:
+            # Iterating over a list of text
+            for text in self.text_list:
+                for line in text2sentences(text, remove_non_english_chars=self.remove_non_english_chars):            
+                    for c in line:
+                        yield c 
+
+
 class LabeledLineSentence(object):
     '''LabeledLineSentence does equivalent preprocessing of documents, but then yields a labeled 
     sentence. The intention is for use with doc2vec'''
