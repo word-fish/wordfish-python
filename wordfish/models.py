@@ -3,12 +3,32 @@ models.py
 
 part of the wordfish python package: specific machine learning models
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
 
-from numpy.random import choice
+from random import sample
 from sklearn import svm
-import numpy
 import pandas
+import math
 import sys
 import os
 
@@ -27,11 +47,11 @@ def build_svm(vectors,labels,kernel="linear",positive_label=1,negative_label=0,t
             positive_examples = data_Y.index[data_Y==positive_label]
             negative_examples = data_Y.index[data_Y==negative_label]
             # hold out some percentage of each for testing
-            testSizePositive = int(numpy.ceil(len(positive_examples)*testing_holdout))
-            testSizeNegative = int(numpy.ceil(len(negative_examples)*testing_holdout))
+            testSizePositive = int(math.ceil(len(positive_examples)*testing_holdout))
+            testSizeNegative = int(math.ceil(len(negative_examples)*testing_holdout))
             testN = testSizePositive + testSizeNegative
-            testPos = choice(positive_examples,testSizePositive).tolist()
-            testNeg = choice(negative_examples,testSizeNegative).tolist()
+            testPos = sample(positive_examples, testSizePositive)
+            testNeg = sample(negative_examples, testSizeNegative)
             test = vectors.loc[testPos+testNeg]
             test_Y = [term if x in testPos else "not %s" %(term) for x in test.index]
             trainPos = [x for x in positive_examples if x not in testPos]

@@ -2,6 +2,26 @@
 utils.py
 part of the wordfish python tools
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
 
 from glob import glob
@@ -13,18 +33,28 @@ import json
 import shutil
 import os
 import re
-import wordfish.hello as hello
 import pickle
 
-def wordfish_home():
-    return os.environ["WORDFISH_HOME"]
+
+def download_nltk():
+    '''download_nltk
+       download nltk to home. If it already exists, just return the directory
+    '''
+    home = os.environ["HOME"]
+    download_dir = os.path.abspath(home, 'nltk_data')
+    if not os.path.exists(download_dir):
+        print("Downloading nltk to %s" %(download_dir))
+        import nltk
+        nltk.download('all')
+    return "%s/nltk_data" %(home)
+
 
 def save_pretty_json(dict_obj,output_file):
     with open(output_file, 'w') as outfile:
         json.dump(dict_obj,outfile)
 
 def get_installdir():
-    return os.path.dirname(os.path.abspath(hello.__file__))
+    return os.path.dirname(os.path.abspath(__file__))
 
 def save_pkl(save_obj,pickle_file):
     pickle.dump(save_obj,open(pickle_file,"wb"))
@@ -77,7 +107,7 @@ remove unicode keys and values from dict, encoding in utf8
 """
 def remove_unicode_dict(input_dict,encoding="utf-8"):
     output_dict = dict()
-    for key,value in input_dict.iteritems():
+    for key,value in input_dict.items():
         if isinstance(input_dict[key],list):
             output_new = [x.encode(encoding) for x in input_dict[key]]
         elif isinstance(input_dict[key],int):
@@ -116,6 +146,16 @@ def get_template(template_file):
     filey.close()
     return template
 
+def get_attribute(entry, name, default=[]):
+    '''A helper to get an attribute from an object, if it exists.
+       If not, return some default.'''
+    try:
+        if hasattr(entry, name):
+            return getattr(entry, name)    
+    except KeyError:
+        pass
+    return default
+
 """
 make a substitution for a template_tag in a template
 """
@@ -123,10 +163,10 @@ def sub_template(template,template_tag,substitution):
     template = template.replace(template_tag,substitution)
     return template
 
-def save_template(output_file,html_snippet):
-    filey = open(output_file,"w")
-    filey.writelines(html_snippet)
-    filey.close()
+def save_template(output_file, html_snippet, mode="w"):
+    with open(output_file, mode) as filley:
+        filey.writelines(html_snippet)
+    return output_file
 
 def untar(tar_file,destination="."):
     tar = tarfile.open(tar_file)
@@ -148,7 +188,7 @@ Ensure utf-8
 """
 def clean_fields(mydict):
     newdict = dict()
-    for field,value in mydict.iteritems():
+    for field,value in mydict.items():
         cleanfield = field.encode("utf-8")
         if isinstance(value,float):
             newdict[cleanfield] = value
@@ -182,7 +222,8 @@ def add_lines(script,lines_to_add):
     filey.writelines("\n".join(lines))
     filey.close()
 
-# INTERNET ################################################
+# INTERNET #####################################################################
+
 def get_url(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -195,8 +236,28 @@ def get_json(url):
     json_single = get_url(url)
     return json.loads(json_single.decode("utf-8"))
 
-def read_json(json_file):
-    return json.load(open(json_file,"rb"))
+
+
+def read_file(filename, mode="r"):
+    with open(filename,mode) as filey:
+        content = filey.read()
+    return content
+
+
+def write_file(filename, content, mode="w"):
+    with open(filename, mode) as filey:
+        if isinstance(content, list):
+            for item in content:
+                filey.writelines(content)
+        else:
+            filey.writelines(content)
+    return filename
+
+
+def read_json(json_file, mode='r'):
+    with open(json_file, mode) as filey:
+        content = json.load(filey)
+    return content
 
 def has_internet_connectivity():
     """has_internet_connectivity

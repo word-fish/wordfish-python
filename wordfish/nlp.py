@@ -3,24 +3,44 @@ nlp:part of the wordfish python package: extracting relationships of terms from 
 
 functions for simple natural language processing
 
+Copyright (c) 2015-2018 Vanessa Sochat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to 
+do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 '''
+from wordfish.terms import check_nltk
 from textblob import TextBlob, Word
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
 from nltk.stem import *
 import nltk.data
-import numpy
 import pandas
 import gensim
 import re
 
+# Ensure has downloaded data
+check_nltk()
 
 def remove_nonenglish_chars(text):
     return re.sub("[^a-zA-Z]", " ", text)
 
-
-    
-def text2sentences(text,remove_non_english_chars=True):
+def text2sentences(text, remove_non_english_chars=True):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')    
     if remove_non_english_chars:
         text = remove_nonenglish_chars(text)
@@ -28,9 +48,39 @@ def text2sentences(text,remove_non_english_chars=True):
         yield s
 
 
+def equation2tokens(tex):
+    '''walk through a LaTeX string, and grab chunks that correspond with known
+       identifiers, meaning anything that starts with \ and ends with one or
+       more whitespaces, a bracket, a ^ or underscore.
+    '''
+    regexp = r'\\(.*?)(\w+|\{|\(|\_|\^)'
+    tokens = []
+    while re.search(regexp, tex) and len(tex) > 0:
+        match = re.search(regexp, tex)
+        # Only take the chunk if it's starting at 0
+        if match.start() == 0:
+            tokens.append(tex[match.start():match.end()])
+            # And update the string
+            tex = tex[match.end():]
+        # Otherwise, add the next character to the tokens list
+        else:
+            tokens.append(tex[0])
+            tex = tex[1:]
+
+    # When we get down here, the regexp doesn't match anymore! Add remaining
+    if len(tex) > 0:
+        tokens = tokens + [t for t in tex]
+    return tokens
+
 
 def processText(text):
-    '''combines text2sentences and sentence2words'''
+    '''combines text2sentences and sentence2words
+
+       Parameters
+       ==========
+       text: the raw string of text to process
+    '''
+
     vector = []
     for line in text2sentences(text):            
         words = sentence2words(line)
@@ -38,13 +88,18 @@ def processText(text):
     return vector
 
 
-
 def sentence2words(sentence,remove_stop_words=True,lower=True):
-    if isinstance(sentence,list): sentence = sentence[0]
+    if isinstance(sentence, list, tuple): 
+        sentence = sentence[0]
     re_white_space = re.compile("\s+")
     stop_words = set(stopwords.words("english"))
-    if lower: sentence = sentence.lower()
+
+    # The user wants to make all letters lowercase
+    if lower: 
+        sentence = sentence.lower()
     words = re_white_space.split(sentence.strip())
+
+    # Remove stop words
     if remove_stop_words:
         words = [w for w in words if w not in stop_words]
     return words
@@ -69,7 +124,7 @@ def do_stem(words,return_unique=True,remove_non_english_words=True):
             word = re.sub("[^a-zA-Z]", " ", word)
         stems.append(stemmer.stem(word))
     if return_unique:
-        return numpy.unique([s.lower() for s in stems]).tolist()
+        return list(set([s.lower() for s in stems]))
     else:
         return stems
 
@@ -90,7 +145,7 @@ def get_total_words(text):
     totalwords = 0
     # Dictionary
     if isinstance(text,dict):
-        for label,sentences in text.iteritems():
+        for label,sentences in text.items():
             if isinstance(sentences,str):
                 sentences = [sentences]
             for sentence in sentences:
@@ -155,7 +210,7 @@ def get_term_counts_dict(terms,text):
     # data frame hold counts
     counts = pandas.DataFrame(0,columns=["count"],index=stems)
 
-    for label,sentences in text.iteritems():
+    for label,sentences in text.items():
         if isinstance(sentences,str):
             sentences = [sentences]
         for sentence in sentences:
@@ -193,6 +248,7 @@ def get_match(phrasematch,entirephrase,found_indices):
 
     full_concept = phrasematch.split(" ")
     foundmatch = True
+
     # We should not find words that have already been found :)
     findices = [i for i in range(0,len(found_indices)) if found_indices[i] == 1]
     for found_index in findices:
@@ -204,11 +260,12 @@ def get_match(phrasematch,entirephrase,found_indices):
         # Missing any one word, not a match
         else:
             foundmatch = False
-    if len(numpy.unique(indices)) == len(full_concept):
+    if len(set(indices)) == len(full_concept):
         for i in range(0,len(indices)-1):
             # Not in chronological order +1, not a match
             if indices[i]+1 != indices[i+1]:
                 foundmatch=False
+
     # Missing any one word, not a match
     else:
         foundmatch = False
@@ -240,7 +297,7 @@ def find_phrases(words,vocabulary,repeat=1):
     (words_index,vocab_index,word,vocab)
     
     '''
-    vocabulary = numpy.unique(vocabulary).tolist()
+    vocabulary = list(set(vocabulary))
     vocabulary = [v.encode("utf-8") for v in vocabulary]
     # We will stem phrases, and search for them across the stemmed words
     vocab_stemmed = stem_phrases(vocabulary)
@@ -269,4 +326,3 @@ def make_lookup(original_list,new_list):
     for x in range(len(new_list)):
         lookup[new_list[x]] = original_list[x]
     return lookup
-
